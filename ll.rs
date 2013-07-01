@@ -1,5 +1,5 @@
-pub use core::libc::*;
-pub use core::libc::types::os::arch::extra::*;
+pub use std::libc::*;
+pub use std::libc::types::os::arch::extra::*;
 
 pub type ATOM = WORD;
 pub type UINT = c_uint;
@@ -40,20 +40,23 @@ pub struct WNDCLASSEX {
     hIconSm: HICON,
 }
 
-pub extern "stdcall" mod user32 {
-    unsafe fn CreateWindowExW(extrastyle: DWORD, classname: LPCWSTR,
-            windowname: LPCWSTR, style: DWORD,
-            x: c_int, y: c_int, width: c_int, height: c_int,
-            parent: HWND, menu: HMENU, instance: HINSTANCE, param: LPVOID
-    ) -> HWND;
+pub mod user32 {
+    use ll::*;
+    extern "stdcall" {
+        unsafe fn CreateWindowExW(extrastyle: DWORD, classname: LPCWSTR,
+                windowname: LPCWSTR, style: DWORD,
+                x: c_int, y: c_int, width: c_int, height: c_int,
+                parent: HWND, menu: HMENU, instance: HINSTANCE, param: LPVOID
+        ) -> HWND;
 
-    unsafe fn MessageBoxW(
-            hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT
-    ) -> c_int;
+        unsafe fn MessageBoxW(
+                hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT
+        ) -> c_int;
 
-    unsafe fn RegisterClassExW(lpwcx: *WNDCLASSEX) -> ATOM;
+        unsafe fn RegisterClassExW(lpwcx: *WNDCLASSEX) -> ATOM;
 
-    unsafe fn DefWindowProcW(
-            hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM
-    ) -> LRESULT;
+        unsafe fn DefWindowProcW(
+                hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM
+        ) -> LRESULT;
+    }
 }

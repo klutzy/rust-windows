@@ -1,4 +1,5 @@
-use core::ptr;
+use std::ptr;
+use std::vec;
 use ll::*;
 
 pub trait Window {
@@ -16,10 +17,8 @@ impl Window for EmptyWindow {
 }
 
 pub fn null() -> EmptyWindow {
-    unsafe {
-        EmptyWindow {
-            raw: ptr::null(),
-        }
+    EmptyWindow {
+        raw: ptr::null(),
     }
 }
 
@@ -29,9 +28,9 @@ pub trait WindowUtil {
 
 impl<T: Window> WindowUtil for T {
     pub fn message_box(&self, msg: &str, title: &str) {
-        let mut wmsg = str::to_utf16(msg);
+        let wmsg = msg.to_utf16();
         wmsg.push(0u16);
-        let mut wtitle = str::to_utf16(title);
+        let wtitle = title.to_utf16();
         wtitle.push(0u16);
         unsafe {
             user32::MessageBoxW(self.hwnd(),
