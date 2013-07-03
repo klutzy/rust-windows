@@ -1,5 +1,5 @@
 use std::ptr;
-use std::vec;
+use std::os::win32::as_utf16_p;
 use ll::*;
 
 pub trait Window {
@@ -28,14 +28,12 @@ pub trait WindowUtil {
 
 impl<T: Window> WindowUtil for T {
     pub fn message_box(&self, msg: &str, title: &str) {
-        let wmsg = msg.to_utf16();
-        wmsg.push(0u16);
-        let wtitle = title.to_utf16();
-        wtitle.push(0u16);
-        unsafe {
-            user32::MessageBoxW(self.hwnd(),
-            vec::raw::to_ptr(wmsg), vec::raw::to_ptr(wtitle),
-            0u32);
+        do as_utf16_p(msg) |msg_p| {
+            do as_utf16_p(title) |title_p| {
+                unsafe {
+                    user32::MessageBoxW(self.hwnd(), msg_p, title_p, 0u32);
+                }
+            }
         }
     }
 }
