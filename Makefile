@@ -19,5 +19,5 @@ examples: libwin32.dummy
 
 .PHONY: clean
 clean:
-	rm -rf libwin32.dummy libwin32*.dll test*.dll
+	rm -rf libwin32.dummy win32*.dll test*.dll
 	$(MAKE) -C examples clean
