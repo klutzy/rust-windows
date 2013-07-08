@@ -73,6 +73,13 @@ pub struct PAINTSTRUCT {
     rgbReserved: *[BYTE, ..32],
 }
 
+pub mod kernel32 {
+    use ll::*;
+    extern "stdcall" {
+        unsafe fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
+    }
+}
+
 pub mod user32 {
     use ll::*;
     extern "stdcall" {
