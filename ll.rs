@@ -3,6 +3,7 @@ pub use std::libc::types::os::arch::extra::*;
 
 pub type ATOM = WORD;
 pub type UINT = c_uint;
+pub type LONG = c_long;
 
 // 32-bit specific
 pub type UINT_PTR = c_uint;
@@ -40,6 +41,20 @@ pub struct WNDCLASSEX {
     hIconSm: HICON,
 }
 
+pub struct POINT {
+    x: LONG,
+    y: LONG,
+}
+
+pub struct MSG {
+    hwnd: HWND,
+    message: UINT,
+    wParam: WPARAM,
+    lParam: LPARAM,
+    time: DWORD,
+    pt: POINT,
+}
+
 pub mod user32 {
     use ll::*;
     extern "stdcall" {
@@ -58,5 +73,19 @@ pub mod user32 {
         unsafe fn DefWindowProcW(
                 hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM
         ) -> LRESULT;
+
+        unsafe fn GetMessageW(
+                lpMsg: *MSG, hWnd: HWND,
+                wMsgFilterMin: UINT, wMsgFilterMAx: UINT
+        ) -> BOOL;
+
+        unsafe fn PeekMessageW(
+                lpMsg: *MSG, hWnd: HWND,
+                wMsgFilterMin: UINT, wMsgFilterMAx: UINT, wRemoveMsg: UINT
+        ) -> BOOL;
+
+        unsafe fn TranslateMessage(lpMsg: *MSG) -> BOOL;
+
+        unsafe fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
     }
 }
