@@ -8,6 +8,7 @@ pub type LONG = c_long;
 // 32-bit specific
 pub type UINT_PTR = c_uint;
 pub type LONG_PTR = c_long;
+pub type ULONG_PTR = c_ulong;
 
 pub type HANDLE = PVOID;
 
@@ -112,5 +113,13 @@ pub mod user32 {
         unsafe fn TranslateMessage(lpMsg: *MSG) -> BOOL;
 
         unsafe fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
+
+        // 32-bit only
+        unsafe fn GetClassLongW(hwnd: HWND, nIndex: c_int) -> DWORD;
+
+        // 32-bit only
+        unsafe fn SetClassLongW(
+                hwnd: HWND, nIndex: c_int, dwNewLong: LONG
+        ) -> DWORD;
     }
 }
