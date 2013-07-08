@@ -43,6 +43,21 @@ pub struct WNDCLASSEX {
     hIconSm: HICON,
 }
 
+pub struct CREATESTRUCT {
+    lpCreateParams: LPVOID,
+    hInstance: HINSTANCE,
+    hMenu: HMENU,
+    hwndParent: HWND,
+    cy: c_int,
+    cx: c_int,
+    y: c_int,
+    x: c_int,
+    style: LONG,
+    lpszName: LPCWSTR,
+    lpszClass: LPCWSTR,
+    dwExStyle: DWORD,
+}
+
 pub struct POINT {
     x: LONG,
     y: LONG,
