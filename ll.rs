@@ -17,6 +17,7 @@ pub type HMENU = HANDLE;
 pub type HICON = HANDLE;
 pub type HINSTANCE = HANDLE;
 pub type HWND = HANDLE;
+pub type HDC = HANDLE;
 
 pub type WPARAM = UINT_PTR;
 pub type LPARAM = LONG_PTR;
@@ -55,6 +56,22 @@ pub struct MSG {
     pt: POINT,
 }
 
+pub struct RECT {
+    left: LONG,
+    top: LONG,
+    right: LONG,
+    bottom: LONG,
+}
+
+pub struct PAINTSTRUCT {
+    hdc: HDC,
+    fErase: BOOL,
+    rcPaint: RECT,
+    fRestore: BOOL,
+    fIncUpdate: BOOL,
+    rgbReserved: *[BYTE, ..32],
+}
+
 pub mod user32 {
     use ll::*;
     extern "stdcall" {
@@ -63,6 +80,14 @@ pub mod user32 {
                 x: c_int, y: c_int, width: c_int, height: c_int,
                 parent: HWND, menu: HMENU, instance: HINSTANCE, param: LPVOID
         ) -> HWND;
+
+        unsafe fn ShowWindow(hwnd: HWND, nCmdShow: c_int) -> BOOL;
+
+        unsafe fn UpdateWindow(hwnd: HWND) -> BOOL;
+
+        unsafe fn BeginPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> HDC;
+
+        unsafe fn EndPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> BOOL;
 
         unsafe fn MessageBoxW(
                 hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT
