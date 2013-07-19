@@ -28,6 +28,40 @@ pub type PVOID = *c_void;
 // extern fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
 pub type WNDPROC = *u8;
 
+pub struct SECURITY_ATTRIBUTES {
+    nLength: DWORD,
+    lpSecurityDescriptor: LPVOID,
+    bInheritHandle: BOOL,
+}
+
+pub struct PROCESS_INFORMATION {
+    hProcess: HANDLE,
+    hTread: HANDLE,
+    dwProcessId: DWORD,
+    dwThreadId: DWORD,
+}
+
+pub struct STARTUPINFO {
+    cb: DWORD,
+    lpReserved: LPWSTR,
+    lpDesktop: LPWSTR,
+    lpTitle: LPWSTR,
+    dwX: DWORD,
+    dwY: DWORD,
+    dwXSize: DWORD,
+    dwYSize: DWORD,
+    dwXCountChars: DWORD,
+    dwYCountChars: DWORD,
+    dwFillAttribute: DWORD,
+    dwFlags: DWORD,
+    wShowWindow: WORD,
+    cbReserved2: WORD,
+    lpReserved2: LPBYTE,
+    hStdInput: HANDLE,
+    hStdOutput: HANDLE,
+    hStdError: HANDLE,
+}
+
 pub struct WNDCLASSEX {
     cbSize: UINT,
     style: UINT,
@@ -92,6 +126,18 @@ pub mod kernel32 {
     use ll::*;
     extern "stdcall" {
         unsafe fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
+
+        unsafe fn CreateProcessW(
+            lpApplicationName: LPCWSTR, lpCommandLine: LPWSTR,
+            lpProcessAttributes: *SECURITY_ATTRIBUTES,
+            lpThreadAttributes: *SECURITY_ATTRIBUTES,
+            bInheritHandles: BOOL,
+            dwCreationFlags: DWORD,
+            lpEnvironment: LPVOID,
+            lpCurrentDirectory: LPCWSTR,
+            lpStartupInfo: LPSTARTUPINFO,
+            lpProcessInformation: LPPROCESS_INFORMATION
+        ) -> BOOL;
     }
 }
 
