@@ -25,7 +25,7 @@ pub type LPARAM = LONG_PTR;
 
 pub type PVOID = *c_void;
 
-// extern fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
+// extern "stdcall" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
 pub type WNDPROC = *u8;
 
 pub struct SECURITY_ATTRIBUTES {
