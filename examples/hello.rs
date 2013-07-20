@@ -14,49 +14,51 @@ impl win32::window::Window for MainWindow {
     fn hwnd(&self) -> HWND {
         self.raw
     }
-}
 
-extern "stdcall" fn main_wnd_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    debug!("main_wnd_proc: hwnd %? / msg 0x%x / w %? / l %?", hwnd, msg as uint, w, l);
-
-    if msg == 0x0001 { // WM_CREATE
-        return 0 as LRESULT;
+    fn set_hwnd(&mut self, hwnd: HWND) {
+        self.raw = hwnd;
     }
-    if msg == 0x0002 { // WM_DESTROY
-        unsafe {
-            user32::PostQuitMessage(0 as c_int);
+
+    fn wnd_proc(&mut self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
+        if msg == 0x0001 { // WM_CREATE
+            return 0 as LRESULT;
         }
-        return 0 as LRESULT;
-    }
-    if msg == 0x000F { // WM_PAINT
-        let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
-        let ps = PAINTSTRUCT {
-            hdc: ptr::null(),
-            fErase: 0 as BOOL,
-            rcPaint: RECT {
-                left: 0 as LONG, top: 0 as LONG,
-                right: 0 as LONG, bottom: 0 as LONG
-            },
-            fRestore: 0 as BOOL,
-            fIncUpdate: 0 as BOOL,
-            rgbReserved: &rgb_res,
-        };
-        unsafe {
-            let dc = user32::BeginPaint(hwnd, &ps);
-
-            let hello = "hello world";
-            let mut hello_p = hello.to_utf16();
-            hello_p.push(0u16);
-            do std::vec::as_mut_buf(hello_p) |buf, len| {
-                let len = len - 1;
-                gdi32::TextOutW(dc, 0 as c_int, 0 as c_int, buf, len as i32);
+        if msg == 0x0002 { // WM_DESTROY
+            unsafe {
+                user32::PostQuitMessage(0 as c_int);
             }
-            user32::EndPaint(hwnd, &ps);
+            return 0 as LRESULT;
         }
+        if msg == 0x000F { // WM_PAINT
+            let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
+            let ps = PAINTSTRUCT {
+                hdc: ptr::null(),
+                fErase: 0 as BOOL,
+                rcPaint: RECT {
+                    left: 0 as LONG, top: 0 as LONG,
+                    right: 0 as LONG, bottom: 0 as LONG
+                },
+                fRestore: 0 as BOOL,
+                fIncUpdate: 0 as BOOL,
+                rgbReserved: &rgb_res,
+            };
+            unsafe {
+                let dc = user32::BeginPaint(self.hwnd(), &ps);
 
-        return 0 as LRESULT;
+                let hello = "hello world";
+                let mut hello_p = hello.to_utf16();
+                hello_p.push(0u16);
+                do std::vec::as_mut_buf(hello_p) |buf, len| {
+                    let len = len - 1;
+                    gdi32::TextOutW(dc, 0 as c_int, 0 as c_int, buf, len as i32);
+                }
+                user32::EndPaint(self.hwnd(), &ps);
+            }
+
+            return 0 as LRESULT;
+        }
+        unsafe { user32::DefWindowProcW(self.hwnd(), msg, w, l) }
     }
-    unsafe { user32::DefWindowProcW(hwnd, msg, w, l) }
 }
 
 impl MainWindow {
@@ -83,14 +85,16 @@ impl MainWindow {
         }
     }
 
-    fn new(instance: HINSTANCE) -> MainWindow {
+    fn new(instance: HINSTANCE) -> @mut Window {
         let clsname = "MainWindow";
         MainWindow::register(instance, clsname);
 
-        let mut window = MainWindow {
+        let window = @mut MainWindow {
             raw: ptr::null(),
             title: ~"Hello",
         };
+
+        get_window_map().insert(window.hwnd(), window as @mut Window);
 
         let WS_OVERLAPPED = 0x00000000u32;
         let WS_CAPTION = 0x00C00000u32;
@@ -104,26 +108,27 @@ impl MainWindow {
         do as_utf16_p(clsname) |clsname_p| {
             do as_utf16_p(window.title) |title_p| {
                 unsafe {
-                    let hwnd = user32::CreateWindowExW(
+                    let _hwnd = user32::CreateWindowExW(
                         0, clsname_p, title_p, WS_OVERLAPPEDWINDOW as DWORD,
                         0 as c_int, 0 as c_int, 400 as c_int, 400 as c_int,
                         ptr::null(), ptr::null(), instance,
                         ptr::null::<*c_void>() as *mut c_void
                     );
-                    window.raw = hwnd;
                 }
             }
         };
 
-        window
+        window as @mut Window
     }
 }
 
 fn main() {
+    init_window_map();
+
     let instance = unsafe {
         kernel32::GetModuleHandleW(ptr::null()) as HINSTANCE
     };
-    let main = MainWindow::new(instance);
+    let main: @mut Window = MainWindow::new(instance);
 
     main.show(1);
     main.update();
