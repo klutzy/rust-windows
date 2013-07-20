@@ -6,20 +6,16 @@ pub trait Window {
     fn hwnd(&self) -> HWND;
 }
 
-pub struct EmptyWindow {
-    raw: HWND,
-}
+pub struct EmptyWindow;
 
 impl Window for EmptyWindow {
     fn hwnd(&self) -> HWND {
-        self.raw
+        ptr::null()
     }
 }
 
 pub fn null() -> EmptyWindow {
-    EmptyWindow {
-        raw: ptr::null(),
-    }
+    EmptyWindow
 }
 
 pub trait WindowUtil {
