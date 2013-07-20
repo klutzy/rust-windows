@@ -197,3 +197,14 @@ pub mod user32 {
         ) -> DWORD;
     }
 }
+
+pub mod gdi32 {
+    use ll::*;
+    #[link_args = "-lgdi32"]
+    extern "stdcall" {
+        unsafe fn TextOutW(
+                hdc: HDC, nXStart: c_int, nYStart: c_int,
+                lpString: LPWSTR, cchString: c_int
+        ) -> BOOL;
+    }
+}
