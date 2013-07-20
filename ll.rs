@@ -178,6 +178,12 @@ pub mod user32 {
                 wMsgFilterMin: UINT, wMsgFilterMAx: UINT, wRemoveMsg: UINT
         ) -> BOOL;
 
+        unsafe fn PostMessageW(
+                hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM
+        ) -> BOOL;
+
+        unsafe fn PostQuitMessage(nExitCode: c_int);
+
         unsafe fn TranslateMessage(lpMsg: *MSG) -> BOOL;
 
         unsafe fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
