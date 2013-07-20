@@ -23,14 +23,26 @@ pub fn null() -> EmptyWindow {
 }
 
 pub trait WindowUtil {
-    pub fn message_box(&self, msg: &str, title: &str);
-
     pub fn show(&self, cmd_show: int) -> bool;
 
     pub fn update(&self) -> bool;
 }
 
 impl<T: Window> WindowUtil for T {
+    pub fn show(&self, cmd_show: int) -> bool {
+        unsafe { user32::ShowWindow(self.hwnd(), cmd_show as c_int) as bool }
+    }
+
+    pub fn update(&self) -> bool {
+        unsafe { user32::UpdateWindow(self.hwnd()) as bool }
+    }
+}
+
+pub trait DialogUtil {
+    pub fn message_box(&self, msg: &str, title: &str);
+}
+
+impl<T: Window> DialogUtil for T {
     pub fn message_box(&self, msg: &str, title: &str) {
         do as_utf16_p(msg) |msg_p| {
             do as_utf16_p(title) |title_p| {
@@ -39,13 +51,5 @@ impl<T: Window> WindowUtil for T {
                 }
             }
         }
-    }
-
-    pub fn show(&self, cmd_show: int) -> bool {
-        unsafe { user32::ShowWindow(self.hwnd(), cmd_show as c_int) as bool }
-    }
-
-    pub fn update(&self) -> bool {
-        unsafe { user32::UpdateWindow(self.hwnd()) as bool }
     }
 }
