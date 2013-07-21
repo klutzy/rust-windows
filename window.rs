@@ -193,3 +193,15 @@ impl<T: Window> DialogUtil for T {
         }
     }
 }
+
+pub trait OnCreate {
+    fn on_create(&mut self, cs: &CREATESTRUCT) -> bool;
+}
+
+pub trait OnDestroy {
+    fn on_destroy(&mut self);
+}
+
+pub trait OnPaint {
+    fn on_paint(&mut self, dc: HDC);
+}

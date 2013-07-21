@@ -25,12 +25,15 @@ impl win32::window::Window for MainWindow {
 
     fn wnd_proc(&mut self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
         if msg == 0x0001 { // WM_CREATE
-            return 0 as LRESULT;
+            let cs = unsafe {
+                let pcs = std::cast::transmute::<LPARAM, *CREATESTRUCT>(l);
+                &(*pcs)
+            };
+            let ret = self.on_create(cs);
+            return if ret { 0 as LRESULT } else { -1 as LRESULT };
         }
         if msg == 0x0002 { // WM_DESTROY
-            unsafe {
-                user32::PostQuitMessage(0 as c_int);
-            }
+            self.on_destroy();
             return 0 as LRESULT;
         }
         if msg == 0x000F { // WM_PAINT
@@ -46,22 +49,41 @@ impl win32::window::Window for MainWindow {
                 fIncUpdate: 0 as BOOL,
                 rgbReserved: &rgb_res,
             };
-            unsafe {
-                let dc = user32::BeginPaint(self.hwnd(), &ps);
 
-                let hello = "hello world";
-                let mut hello_p = hello.to_utf16();
-                hello_p.push(0u16);
-                do std::vec::as_mut_buf(hello_p) |buf, len| {
-                    let len = len - 1;
-                    gdi32::TextOutW(dc, 0 as c_int, 0 as c_int, buf, len as i32);
-                }
-                user32::EndPaint(self.hwnd(), &ps);
-            }
-
+            let dc = unsafe { user32::BeginPaint(self.hwnd(), &ps) };
+            self.on_paint(dc);
+            unsafe { user32::EndPaint(self.hwnd(), &ps) };
             return 0 as LRESULT;
         }
         unsafe { user32::DefWindowProcW(self.hwnd(), msg, w, l) }
+    }
+}
+
+impl OnCreate for MainWindow {
+    fn on_create(&mut self, _cs: &CREATESTRUCT) -> bool {
+        true
+    }
+}
+
+impl OnDestroy for MainWindow {
+    fn on_destroy(&mut self) {
+        unsafe {
+            user32::PostQuitMessage(0 as c_int);
+        }
+    }
+}
+
+impl OnPaint for MainWindow {
+    fn on_paint(&mut self, dc: HDC) {
+        let hello = "hello world";
+        let mut hello_p = hello.to_utf16();
+        hello_p.push(0u16);
+        do std::vec::as_mut_buf(hello_p) |buf, len| {
+            let len = len - 1;
+            unsafe {
+                gdi32::TextOutW(dc, 0 as c_int, 0 as c_int, buf, len as i32);
+            }
+        }
     }
 }
 
