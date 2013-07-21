@@ -2,11 +2,14 @@ use std::local_data;
 use std::hashmap::HashMap;
 use std::ptr;
 use std::os::win32::as_utf16_p;
+use std;
+
 use ll::*;
 
 pub trait Window {
     fn hwnd(&self) -> HWND;
     fn set_hwnd(&mut self, HWND);
+    fn classname<'s>(&'s self) -> &'s str;
     fn wnd_proc(&mut self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
 }
 
@@ -21,6 +24,10 @@ impl Window for EmptyWindow {
         fail!("set_hwnd on EmptyWindow");
     }
 
+    fn classname<'s>(&'s self) -> &'s str {
+        "EmptyWindow"
+    }
+
     fn wnd_proc(&mut self, _msg: UINT, _w: WPARAM, _l: LPARAM) -> LRESULT {
         fail!("wnd_proc on EmptyWindow");
     }
@@ -32,15 +39,19 @@ pub fn null() -> EmptyWindow {
 
 impl Window for @mut Window {
     fn hwnd(&self) -> HWND {
-        (*self).hwnd()
+        self.hwnd()
     }
 
     fn set_hwnd(&mut self, hwnd: HWND) {
-        (*self).set_hwnd(hwnd)
+        self.set_hwnd(hwnd)
+    }
+
+    fn classname<'s>(&'s self) -> &'s str {
+        self.classname()
     }
 
     fn wnd_proc(&mut self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-        (*self).wnd_proc(msg, w, l)
+        self.wnd_proc(msg, w, l)
     }
 }
 
@@ -97,12 +108,67 @@ pub extern "stdcall" fn main_wnd_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARA
 }
 
 pub trait WindowUtil {
+    pub fn register(&self, instance: HINSTANCE) -> bool;
+
+    fn create(@mut self, instance: HINSTANCE, title: &str) -> bool;
+
     pub fn show(&self, cmd_show: int) -> bool;
 
     pub fn update(&self) -> bool;
 }
 
-impl<T: Window> WindowUtil for T {
+impl<T: Window + 'static> WindowUtil for T {
+    fn register(&self, instance: HINSTANCE) -> bool {
+        do as_utf16_p(self.classname()) |clsname_p| {
+            let wcex = WNDCLASSEX {
+                cbSize: std::sys::size_of::<WNDCLASSEX>() as UINT,
+                style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
+                lpfnWndProc: main_wnd_proc,
+                cbClsExtra: 0,
+                cbWndExtra: 0,
+                hInstance: instance,
+                hIcon: ptr::null(),
+                hCursor: ptr::null(),
+                hbrBackground: (5 + 1) as HBRUSH,
+                lpszMenuName: ptr::null(),
+                lpszClassName: clsname_p,
+                hIconSm: ptr::null(),
+            };
+
+            let res = unsafe { user32::RegisterClassExW(&wcex) };
+            res != 0
+        }
+    }
+
+    fn create(@mut self, instance: HINSTANCE, title: &str) -> bool {
+        (&*self).register(instance);
+        get_window_map().insert(self.hwnd(), self as @mut Window);
+
+        let WS_OVERLAPPED = 0x00000000u32;
+        let WS_CAPTION = 0x00C00000u32;
+        let WS_SYSMENU = 0x00080000u32;
+        let WS_THICKFRAME = 0x00040000u32;
+        let WS_MINIMIZEBOX = 0x00020000u32;
+        let WS_MAXIMIZEBOX = 0x00010000u32;
+        let WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
+                WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+
+        let hwnd = unsafe {
+            do as_utf16_p(self.classname()) |clsname_p| {
+                do as_utf16_p(title) |title_p| {
+                    let hwnd = user32::CreateWindowExW(
+                        0, clsname_p, title_p, WS_OVERLAPPEDWINDOW as DWORD,
+                        0 as c_int, 0 as c_int, 400 as c_int, 400 as c_int,
+                        ptr::null(), ptr::null(), instance,
+                        ptr::null::<*c_void>() as *mut c_void
+                    );
+                    hwnd
+                }
+            }
+        };
+        hwnd != ptr::null()
+    }
+
     pub fn show(&self, cmd_show: int) -> bool {
         unsafe { user32::ShowWindow(self.hwnd(), cmd_show as c_int) as bool }
     }
