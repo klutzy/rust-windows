@@ -66,10 +66,10 @@ impl win32::window::Window for MainWindow {
 }
 
 impl MainWindow {
-    fn new(instance: HINSTANCE) -> @mut Window {
+    fn new(instance: HINSTANCE, title: ~str) -> @mut Window {
         let window = @mut MainWindow {
             raw: ptr::null(),
-            title: ~"Hello",
+            title: title,
         };
 
         window.create(instance, window.title);
@@ -80,38 +80,13 @@ impl MainWindow {
 fn main() {
     init_window_map();
 
-    let instance = unsafe {
-        kernel32::GetModuleHandleW(ptr::null()) as HINSTANCE
-    };
-    let main: @mut Window = MainWindow::new(instance);
+    let instance = win32::get_main_instance();
+    let main: @mut Window = MainWindow::new(instance, ~"Hello");
 
     main.show(1);
     main.update();
 
-    let msg = MSG {
-        hwnd: ptr::null(),
-        message: 0 as UINT,
-        wParam: 0 as WPARAM,
-        lParam: 0 as LPARAM,
-        time: 0 as DWORD,
-        pt: POINT { x: 0 as LONG, y: 0 as LONG },
-    };
-    loop {
-        let ret = unsafe {
-            user32::GetMessageW(&msg as *MSG, ptr::null(),
-                    0 as UINT, 0 as UINT)
-        };
-
-        if ret == 0 {
-            let exit_code = msg.wParam;
-            std::os::set_exit_status(exit_code as int);
-            return;
-        }
-        else {
-            unsafe {
-                user32::TranslateMessage(&msg as *MSG);
-                user32::DispatchMessageW(&msg as *MSG);
-            }
-        }
-    }
+    let exit_code = win32::main_window_loop();
+    std::os::set_exit_status(exit_code as int);
+    return;
 }
