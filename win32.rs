@@ -5,7 +5,11 @@ use std::ptr;
 
 use ll::*;
 
-pub mod ll;
+pub mod ll {
+    pub use ll::all::*;
+    pub mod all;
+}
+
 pub mod window;
 
 /// returns main HINSTANCE which can be obtained from WinMain().
