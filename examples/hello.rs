@@ -39,7 +39,7 @@ impl win32::window::Window for MainWindow {
         if msg == 0x000F { // WM_PAINT
             let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
             let ps = PAINTSTRUCT {
-                hdc: ptr::null(),
+                hdc: ptr::mut_null(),
                 fErase: 0 as BOOL,
                 rcPaint: RECT {
                     left: 0 as LONG, top: 0 as LONG,
@@ -90,7 +90,7 @@ impl OnPaint for MainWindow {
 impl MainWindow {
     fn new(instance: HINSTANCE, title: ~str) -> @mut Window {
         let window = @mut MainWindow {
-            raw: ptr::null(),
+            raw: ptr::mut_null(),
             title: title,
         };
 

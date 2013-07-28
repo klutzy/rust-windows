@@ -17,7 +17,7 @@ pub struct EmptyWindow;
 
 impl Window for EmptyWindow {
     fn hwnd(&self) -> HWND {
-        ptr::null()
+        ptr::mut_null()
     }
 
     fn set_hwnd(&mut self, _hwnd: HWND) {
@@ -127,12 +127,12 @@ impl<T: Window + 'static> WindowUtil for T {
                 cbClsExtra: 0,
                 cbWndExtra: 0,
                 hInstance: instance,
-                hIcon: ptr::null(),
-                hCursor: ptr::null(),
+                hIcon: ptr::mut_null(),
+                hCursor: ptr::mut_null(),
                 hbrBackground: (5 + 1) as HBRUSH,
                 lpszMenuName: ptr::null(),
                 lpszClassName: clsname_p,
-                hIconSm: ptr::null(),
+                hIconSm: ptr::mut_null(),
             };
 
             let res = unsafe { user32::RegisterClassExW(&wcex) };
@@ -159,14 +159,14 @@ impl<T: Window + 'static> WindowUtil for T {
                     let hwnd = user32::CreateWindowExW(
                         0, clsname_p, title_p, WS_OVERLAPPEDWINDOW as DWORD,
                         0 as c_int, 0 as c_int, 400 as c_int, 400 as c_int,
-                        ptr::null(), ptr::null(), instance,
+                        ptr::mut_null(), ptr::mut_null(), instance,
                         ptr::null::<*c_void>() as *mut c_void
                     );
                     hwnd
                 }
             }
         };
-        hwnd != ptr::null()
+        hwnd != ptr::mut_null()
     }
 
     pub fn show(&self, cmd_show: int) -> bool {

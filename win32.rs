@@ -6,7 +6,12 @@ use std::ptr;
 use ll::*;
 
 pub mod ll {
+    pub use ll::platform::*;
+    pub use ll::windef::*;
     pub use ll::all::*;
+
+    pub mod platform;
+    pub mod windef;
     pub mod all;
 }
 
@@ -19,7 +24,7 @@ pub fn get_main_instance() -> HINSTANCE {
 
 pub fn main_window_loop() -> u32 {
     let msg = MSG {
-        hwnd: ptr::null(),
+        hwnd: ptr::mut_null(),
         message: 0 as UINT,
         wParam: 0 as WPARAM,
         lParam: 0 as LPARAM,
@@ -28,7 +33,7 @@ pub fn main_window_loop() -> u32 {
     };
     loop {
         let ret = unsafe {
-            user32::GetMessageW(&msg as *MSG, ptr::null(),
+            user32::GetMessageW(&msg as *MSG, ptr::mut_null(),
                     0 as UINT, 0 as UINT)
         };
 

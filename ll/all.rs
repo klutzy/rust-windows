@@ -1,29 +1,5 @@
-pub use std::libc::*;
-pub use std::libc::types::os::arch::extra::*;
-
-pub type ATOM = WORD;
-pub type UINT = c_uint;
-pub type LONG = c_long;
-
-// 32-bit specific
-pub type UINT_PTR = c_uint;
-pub type LONG_PTR = c_long;
-pub type ULONG_PTR = c_ulong;
-
-pub type HANDLE = PVOID;
-
-pub type HBRUSH = HANDLE;
-pub type HCURSOR = HICON;
-pub type HMENU = HANDLE;
-pub type HICON = HANDLE;
-pub type HINSTANCE = HANDLE;
-pub type HWND = HANDLE;
-pub type HDC = HANDLE;
-
-pub type WPARAM = UINT_PTR;
-pub type LPARAM = LONG_PTR;
-
-pub type PVOID = *c_void;
+use ll::platform::*;
+use ll::windef::*;
 
 // extern "stdcall" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
 pub type WNDPROC = *u8;
