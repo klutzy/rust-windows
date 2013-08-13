@@ -7,7 +7,7 @@ OBJ=$(patsubst %.rs, %.o, $(SRC))
 all: $(EXE)
 
 %.exe: %.rs ../libwin32.dummy
-	$(RUSTC) -L .. -o $@ $<
+	$(RUSTC) --link-args "-Wl,--subsystem,windows" -L .. -o $@ $<
 
 .PHONY: clean
 clean:
