@@ -1,7 +1,7 @@
 use ll::platform::*;
 use ll::windef::*;
 
-// extern "stdcall" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
+// extern "stdcall" pub fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
 pub type WNDPROC = *u8;
 
 pub struct SECURITY_ATTRIBUTES {
@@ -101,9 +101,9 @@ pub struct PAINTSTRUCT {
 pub mod kernel32 {
     use ll::*;
     extern "stdcall" {
-        unsafe fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
+        pub fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
 
-        unsafe fn CreateProcessW(
+        pub fn CreateProcessW(
             lpApplicationName: LPCWSTR, lpCommandLine: LPWSTR,
             lpProcessAttributes: *SECURITY_ATTRIBUTES,
             lpThreadAttributes: *SECURITY_ATTRIBUTES,
@@ -120,55 +120,55 @@ pub mod kernel32 {
 pub mod user32 {
     use ll::*;
     extern "stdcall" {
-        unsafe fn CreateWindowExW(extrastyle: DWORD, classname: LPCWSTR,
+        pub fn CreateWindowExW(extrastyle: DWORD, classname: LPCWSTR,
                 windowname: LPCWSTR, style: DWORD,
                 x: c_int, y: c_int, width: c_int, height: c_int,
                 parent: HWND, menu: HMENU, instance: HINSTANCE, param: LPVOID
         ) -> HWND;
 
-        unsafe fn ShowWindow(hwnd: HWND, nCmdShow: c_int) -> BOOL;
+        pub fn ShowWindow(hwnd: HWND, nCmdShow: c_int) -> BOOL;
 
-        unsafe fn UpdateWindow(hwnd: HWND) -> BOOL;
+        pub fn UpdateWindow(hwnd: HWND) -> BOOL;
 
-        unsafe fn BeginPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> HDC;
+        pub fn BeginPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> HDC;
 
-        unsafe fn EndPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> BOOL;
+        pub fn EndPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> BOOL;
 
-        unsafe fn MessageBoxW(
+        pub fn MessageBoxW(
                 hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT
         ) -> c_int;
 
-        unsafe fn RegisterClassExW(lpwcx: *WNDCLASSEX) -> ATOM;
+        pub fn RegisterClassExW(lpwcx: *WNDCLASSEX) -> ATOM;
 
-        unsafe fn DefWindowProcW(
+        pub fn DefWindowProcW(
                 hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM
         ) -> LRESULT;
 
-        unsafe fn GetMessageW(
+        pub fn GetMessageW(
                 lpMsg: *MSG, hWnd: HWND,
                 wMsgFilterMin: UINT, wMsgFilterMAx: UINT
         ) -> BOOL;
 
-        unsafe fn PeekMessageW(
+        pub fn PeekMessageW(
                 lpMsg: *MSG, hWnd: HWND,
                 wMsgFilterMin: UINT, wMsgFilterMAx: UINT, wRemoveMsg: UINT
         ) -> BOOL;
 
-        unsafe fn PostMessageW(
+        pub fn PostMessageW(
                 hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM
         ) -> BOOL;
 
-        unsafe fn PostQuitMessage(nExitCode: c_int);
+        pub fn PostQuitMessage(nExitCode: c_int);
 
-        unsafe fn TranslateMessage(lpMsg: *MSG) -> BOOL;
+        pub fn TranslateMessage(lpMsg: *MSG) -> BOOL;
 
-        unsafe fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
-
-        // 32-bit only
-        unsafe fn GetClassLongW(hwnd: HWND, nIndex: c_int) -> DWORD;
+        pub fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
 
         // 32-bit only
-        unsafe fn SetClassLongW(
+        pub fn GetClassLongW(hwnd: HWND, nIndex: c_int) -> DWORD;
+
+        // 32-bit only
+        pub fn SetClassLongW(
                 hwnd: HWND, nIndex: c_int, dwNewLong: LONG
         ) -> DWORD;
     }
@@ -178,7 +178,7 @@ pub mod gdi32 {
     use ll::*;
     #[link_args = "-lgdi32"]
     extern "stdcall" {
-        unsafe fn TextOutW(
+        pub fn TextOutW(
                 hdc: HDC, nXStart: c_int, nYStart: c_int,
                 lpString: LPWSTR, cchString: c_int
         ) -> BOOL;

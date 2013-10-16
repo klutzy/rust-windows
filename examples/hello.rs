@@ -1,29 +1,30 @@
+#[feature(globs)];
+
 extern mod win32;
 
-use std::ptr;
+use std::local_data;
 
 use win32::window::*;
 use win32::ll::*;
 
-struct MainWindow {
-    raw: HWND,
+struct MainFrame {
+    win: Window,
     title: ~str,
 }
 
-impl win32::window::Window for MainWindow {
-    fn hwnd(&self) -> HWND {
-        self.raw
+impl OnCreate for MainFrame {}
+impl OnDestroy for MainFrame {}
+
+impl WndProc for MainFrame {
+    fn wnd<'a>(&'a self) -> &'a Window {
+        &self.win
     }
 
-    fn set_hwnd(&mut self, hwnd: HWND) {
-        self.raw = hwnd;
+    fn wnd_mut<'a>(&'a mut self) -> &'a mut Window {
+        &mut self.win
     }
 
-    fn classname<'s>(&'s self) -> &'s str {
-        "MainWindow"
-    }
-
-    fn wnd_proc(&mut self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
+    fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
         if msg == 0x0001 { // WM_CREATE
             let cs = unsafe {
                 let pcs = std::cast::transmute::<LPARAM, *CREATESTRUCT>(l);
@@ -37,78 +38,47 @@ impl win32::window::Window for MainWindow {
             return 0 as LRESULT;
         }
         if msg == 0x000F { // WM_PAINT
-            let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
-            let ps = PAINTSTRUCT {
-                hdc: ptr::mut_null(),
-                fErase: 0 as BOOL,
-                rcPaint: RECT {
-                    left: 0 as LONG, top: 0 as LONG,
-                    right: 0 as LONG, bottom: 0 as LONG
-                },
-                fRestore: 0 as BOOL,
-                fIncUpdate: 0 as BOOL,
-                rgbReserved: &rgb_res,
-            };
-
-            let dc = unsafe { user32::BeginPaint(self.hwnd(), &ps) };
+            let (dc, ps) = (*self).begin_paint();
             self.on_paint(dc);
-            unsafe { user32::EndPaint(self.hwnd(), &ps) };
+            (*self).end_paint(&ps);
             return 0 as LRESULT;
         }
-        unsafe { user32::DefWindowProcW(self.hwnd(), msg, w, l) }
+        win32::def_window_proc(self.wnd().wnd, msg, w, l)
     }
 }
 
-impl OnCreate for MainWindow {
-    fn on_create(&mut self, _cs: &CREATESTRUCT) -> bool {
-        true
-    }
-}
-
-impl OnDestroy for MainWindow {
-    fn on_destroy(&mut self) {
-        unsafe {
-            user32::PostQuitMessage(0 as c_int);
-        }
-    }
-}
-
-impl OnPaint for MainWindow {
-    fn on_paint(&mut self, dc: HDC) {
+impl OnPaint for MainFrame {
+    fn on_paint(&self, dc: HDC) {
         let hello = "hello world";
-        let mut hello_p = hello.to_utf16();
-        hello_p.push(0u16);
-        do std::vec::as_mut_buf(hello_p) |buf, len| {
-            let len = len - 1;
-            unsafe {
-                gdi32::TextOutW(dc, 0 as c_int, 0 as c_int, buf, len as i32);
-            }
-        }
+        (*self).text_out(dc, 0, 0, hello);
     }
 }
 
-impl MainWindow {
-    fn new(instance: HINSTANCE, title: ~str) -> @mut Window {
-        let window = @mut MainWindow {
-            raw: ptr::mut_null(),
-            title: title,
-        };
+impl MainFrame {
+    fn new(instance: Instance, title: ~str) -> Option<Window> {
+        let classname = "MainFrame";
+        instance.register(classname);
 
-        window.create(instance, window.title);
-        window as @mut Window
+        let proc = ~MainFrame {
+            win: Window::null(),
+            title: title.clone(),
+        };
+        local_data::set(key_init_wnd, proc as ~WndProc);
+
+        Window::create(instance, classname, title)
     }
 }
 
 fn main() {
     init_window_map();
 
-    let instance = win32::get_main_instance();
-    let main: @mut Window = MainWindow::new(instance, ~"Hello");
+    let instance = Instance::main_instance();
+    let main = MainFrame::new(instance, ~"Hello");
+    let main = main.unwrap();
 
     main.show(1);
     main.update();
 
     let exit_code = win32::main_window_loop();
     std::os::set_exit_status(exit_code as int);
-    return;
 }

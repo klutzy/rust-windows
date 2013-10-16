@@ -73,28 +73,28 @@ pub type FARPROC = *u8;
 pub type NEARPROC = *u8;
 pub type PROC = *u8;
 pub struct Struct_tagRECT {
-    pub left: LONG,
-    pub top: LONG,
-    pub right: LONG,
-    pub bottom: LONG,
+    left: LONG,
+    top: LONG,
+    right: LONG,
+    bottom: LONG,
 }
 pub type RECT = Struct_tagRECT;
 pub type PRECT = *mut Struct_tagRECT;
 pub type LPRECT = *mut Struct_tagRECT;
 pub type LPCRECT = *RECT;
 pub struct Struct_tagRECTL {
-    pub left: LONG,
-    pub top: LONG,
-    pub right: LONG,
-    pub bottom: LONG,
+    left: LONG,
+    top: LONG,
+    right: LONG,
+    bottom: LONG,
 }
 pub type RECTL = Struct_tagRECTL;
 pub type PRECTL = *mut Struct_tagRECTL;
 pub type LPRECTL = *mut Struct_tagRECTL;
 pub type LPCRECTL = *RECTL;
 pub struct Struct_tagPOINT {
-    pub x: LONG,
-    pub y: LONG,
+    x: LONG,
+    y: LONG,
 }
 pub type POINT = Struct_tagPOINT;
 pub type POINTL = Struct_tagPOINT;
@@ -103,8 +103,8 @@ pub type LPPOINT = *mut Struct_tagPOINT;
 pub type PPOINTL = *mut Struct_tagPOINT;
 pub type LPPOINTL = *mut Struct_tagPOINT;
 pub struct Struct_tagSIZE {
-    pub cx: LONG,
-    pub cy: LONG,
+    cx: LONG,
+    cy: LONG,
 }
 pub type SIZE = Struct_tagSIZE;
 pub type SIZEL = Struct_tagSIZE;
@@ -113,8 +113,8 @@ pub type LPSIZE = *mut Struct_tagSIZE;
 pub type PSIZEL = *mut Struct_tagSIZE;
 pub type LPSIZEL = *mut Struct_tagSIZE;
 pub struct Struct_tagPOINTS {
-    pub x: SHORT,
-    pub y: SHORT,
+    x: SHORT,
+    y: SHORT,
 }
 pub type POINTS = Struct_tagPOINTS;
 pub type PPOINTS = *mut Struct_tagPOINTS;

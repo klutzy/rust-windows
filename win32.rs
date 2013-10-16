@@ -1,3 +1,4 @@
+#[feature(globs)];
 #[crate_type = "lib"];
 #[link(name = "win32")];
 
@@ -17,11 +18,12 @@ pub mod ll {
 
 pub mod window;
 
-/// returns main HINSTANCE which can be obtained from WinMain().
-pub fn get_main_instance() -> HINSTANCE {
-    unsafe { kernel32::GetModuleHandleW(ptr::null()) as HINSTANCE }
+#[fixed_stack_segment]
+pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
+    unsafe { user32::DefWindowProcW(hwnd, msg, w, l) }
 }
 
+#[fixed_stack_segment]
 pub fn main_window_loop() -> u32 {
     let msg = MSG {
         hwnd: ptr::mut_null(),
