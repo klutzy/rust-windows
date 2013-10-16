@@ -2,8 +2,6 @@
 
 extern mod win32;
 
-use std::local_data;
-
 use win32::window::*;
 use win32::ll::*;
 
@@ -49,23 +47,19 @@ impl WndProc for MainFrame {
 
 impl OnPaint for MainFrame {
     fn on_paint(&self, dc: HDC) {
-        let hello = "hello world";
-        (*self).text_out(dc, 0, 0, hello);
+        (*self).text_out(dc, 0, 0, self.title);
     }
 }
 
 impl MainFrame {
     fn new(instance: Instance, title: ~str) -> Option<Window> {
-        let classname = "MainFrame";
-        instance.register(classname);
-
         let proc = ~MainFrame {
             win: Window::null(),
             title: title.clone(),
         };
-        local_data::set(key_init_wnd, proc as ~WndProc);
 
-        Window::create(instance, classname, title)
+        let classname = "MainFrame";
+        Window::create(instance, proc as ~WndProc, classname, title)
     }
 }
 

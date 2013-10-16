@@ -70,7 +70,10 @@ impl Window {
     }
 
     #[fixed_stack_segment]
-    pub fn create(instance: Instance, classname: &str, title: &str) -> Option<Window> {
+    pub fn create(instance: Instance, proc: ~WndProc, classname: &str, title: &str) -> Option<Window> {
+        instance.register(classname);
+        local_data::set(key_init_wnd, proc);
+
         let WS_OVERLAPPED = 0x00000000u32;
         let WS_CAPTION = 0x00C00000u32;
         let WS_SYSMENU = 0x00080000u32;
