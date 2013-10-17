@@ -13,34 +13,57 @@ pub fn as_utf16_p<T>(s: &str, f: &fn(*u16) -> T) -> T {
     t.as_imm_buf(|buf, _len| f(buf))
 }
 
+pub fn as_utf16_p_or_null<T>(s: &Option<~str>, f: &fn(*u16) -> T) -> T {
+    match s {
+        &None => f(ptr::null()),
+        &Some(ref s) => as_utf16_p(*s, f),
+    }
+}
+
 pub struct Instance {
     instance: HINSTANCE
 }
 
-impl Instance {
-    #[fixed_stack_segment]
-    pub fn register(&self, classname: &str) -> bool {
-        do as_utf16_p(classname) |clsname_p| {
-            let wcex = WNDCLASSEX {
-                cbSize: std::sys::size_of::<WNDCLASSEX>() as UINT,
-                style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
-                lpfnWndProc: main_wnd_proc as *u8,
-                cbClsExtra: 0,
-                cbWndExtra: 0,
-                hInstance: self.instance,
-                hIcon: ptr::mut_null(),
-                hCursor: ptr::mut_null(),
-                hbrBackground: (5 + 1) as HBRUSH,
-                lpszMenuName: ptr::null(),
-                lpszClassName: clsname_p,
-                hIconSm: ptr::mut_null(),
-            };
+pub struct WndClass {
+    classname: ~str,
+    style: uint,
+    icon: HICON,
+    icon_small: HICON,
+    cursor: HCURSOR,
+    background: HBRUSH,
+    menu_name: Option<~str>,
+    cls_extra: int,
+    wnd_extra: int,
+}
 
-            let res = unsafe { user32::RegisterClassExW(&wcex) };
-            res != 0
+impl WndClass {
+    #[fixed_stack_segment]
+    pub fn register(&self, instance: Instance) -> bool {
+        do as_utf16_p_or_null(&self.menu_name) |menuname_p| {
+            do as_utf16_p(self.classname) |clsname_p| {
+                let wcex = WNDCLASSEX {
+                    cbSize: std::sys::size_of::<WNDCLASSEX>() as UINT,
+                    style: self.style as UINT,
+                    lpfnWndProc: main_wnd_proc as *u8,
+                    cbClsExtra: self.cls_extra as INT,
+                    cbWndExtra: self.wnd_extra as INT,
+                    hInstance: instance.instance,
+                    hIcon: self.icon,
+                    hCursor: self.cursor,
+                    hbrBackground: self.background,
+                    lpszMenuName: menuname_p,
+                    lpszClassName: clsname_p,
+                    hIconSm: self.icon_small,
+                };
+
+                let res = unsafe { user32::RegisterClassExW(&wcex) };
+                res != 0
+            }
         }
     }
+}
 
+impl Instance {
     #[fixed_stack_segment]
     pub fn main_instance() -> Instance {
         Instance {
@@ -70,9 +93,13 @@ impl Window {
     }
 
     #[fixed_stack_segment]
-    pub fn create(instance: Instance, proc: ~WndProc, classname: &str, title: &str) -> Option<Window> {
-        instance.register(classname);
-        local_data::set(key_init_wnd, proc);
+    pub fn create(instance: Instance, proc: ~WndProc, wnd_class: &WndClass, title: &str) -> Option<Window> {
+        let res = wnd_class.register(instance);
+        if res {
+            local_data::set(key_init_wnd, proc);
+        } else {
+            return None;
+        }
 
         let WS_OVERLAPPED = 0x00000000u32;
         let WS_CAPTION = 0x00C00000u32;
@@ -84,7 +111,7 @@ impl Window {
                 WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
         let wnd = unsafe {
-            do as_utf16_p(classname) |clsname_p| {
+            do as_utf16_p(wnd_class.classname) |clsname_p| {
                 do as_utf16_p(title) |title_p| {
                     let wnd = user32::CreateWindowExW(
                         0, clsname_p, title_p, WS_OVERLAPPEDWINDOW as DWORD,

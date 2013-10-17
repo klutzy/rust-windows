@@ -2,6 +2,8 @@
 
 extern mod win32;
 
+use std::ptr;
+
 use win32::window::*;
 use win32::ll::*;
 
@@ -58,8 +60,19 @@ impl MainFrame {
             title: title.clone(),
         };
 
-        let classname = "MainFrame";
-        Window::create(instance, proc as ~WndProc, classname, title)
+        let wnd_class = WndClass {
+            classname: ~"MainFrame",
+            style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
+            icon: ptr::mut_null(),
+            icon_small: ptr::mut_null(),
+            cursor: ptr::mut_null(),
+            background: (5 + 1) as HBRUSH,
+            menu_name: None,
+            cls_extra: 0,
+            wnd_extra: 0,
+        };
+
+        Window::create(instance, proc as ~WndProc, &wnd_class, title)
     }
 }
 
