@@ -72,7 +72,29 @@ impl MainFrame {
             wnd_extra: 0,
         };
 
-        Window::create(instance, proc as ~WndProc, &wnd_class, title)
+        let WS_OVERLAPPED = 0x00000000u32;
+        let WS_CAPTION = 0x00C00000u32;
+        let WS_SYSMENU = 0x00080000u32;
+        let WS_THICKFRAME = 0x00040000u32;
+        let WS_MINIMIZEBOX = 0x00020000u32;
+        let WS_MAXIMIZEBOX = 0x00010000u32;
+        let WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
+                WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+
+        let win_params = WindowParams {
+            class: wnd_class,
+            window_name: title,
+            style: WS_OVERLAPPEDWINDOW,
+            x: 0,
+            y: 0,
+            width: 400,
+            height: 400,
+            parent: Window::null(),
+            menu: ptr::mut_null(),
+            ex_style: 0,
+        };
+
+        Window::create(instance, proc as ~WndProc, &win_params)
     }
 }
 

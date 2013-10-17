@@ -72,6 +72,19 @@ impl Instance {
     }
 }
 
+pub struct WindowParams {
+    class: WndClass,
+    window_name: ~str,
+    style: u32,
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+    parent: Window,
+    menu: HMENU,
+    ex_style: u32,
+}
+
 #[deriving(Eq, IterBytes)]
 pub struct Window {
     wnd: HWND,
@@ -93,31 +106,23 @@ impl Window {
     }
 
     #[fixed_stack_segment]
-    pub fn create(instance: Instance, proc: ~WndProc, wnd_class: &WndClass, title: &str) -> Option<Window> {
-        let res = wnd_class.register(instance);
+    pub fn create(instance: Instance, proc: ~WndProc, params: &WindowParams) -> Option<Window> {
+        let res = params.class.register(instance);
         if res {
             local_data::set(key_init_wnd, proc);
         } else {
             return None;
         }
 
-        let WS_OVERLAPPED = 0x00000000u32;
-        let WS_CAPTION = 0x00C00000u32;
-        let WS_SYSMENU = 0x00080000u32;
-        let WS_THICKFRAME = 0x00040000u32;
-        let WS_MINIMIZEBOX = 0x00020000u32;
-        let WS_MAXIMIZEBOX = 0x00010000u32;
-        let WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
-                WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-
         let wnd = unsafe {
-            do as_utf16_p(wnd_class.classname) |clsname_p| {
-                do as_utf16_p(title) |title_p| {
+            do as_utf16_p(params.class.classname) |clsname_p| {
+                do as_utf16_p(params.window_name) |title_p| {
                     let wnd = user32::CreateWindowExW(
-                        0, clsname_p, title_p, WS_OVERLAPPEDWINDOW as DWORD,
-                        0 as c_int, 0 as c_int, 400 as c_int, 400 as c_int,
-                        ptr::mut_null(), ptr::mut_null(), instance.instance,
-                        ptr::null::<*c_void>() as *mut c_void
+                        params.ex_style, clsname_p, title_p, params.style,
+                        params.x as c_int, params.y as c_int,
+                        params.width as c_int, params.height as c_int,
+                        params.parent.wnd, params.menu, instance.instance,
+                        ptr::mut_null()
                     );
                     wnd
                 }
