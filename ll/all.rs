@@ -170,6 +170,11 @@ extern "stdcall" {
     pub fn SetClassLongW(
             hwnd: HWND, nIndex: c_int, dwNewLong: LONG
     ) -> DWORD;
+
+    pub fn LoadImageW(
+        hinst: HINSTANCE, name: LPCWSTR, type_: UINT,
+        xDesired: c_int, yDesired: c_int, load: UINT
+    ) -> HANDLE;
 }
 
 // gdi32

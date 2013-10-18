@@ -29,7 +29,7 @@ pub struct WndClass {
     style: uint,
     icon: HICON,
     icon_small: HICON,
-    cursor: HCURSOR,
+    cursor: Cursor,
     background: HBRUSH,
     menu_name: Option<~str>,
     cls_extra: int,
@@ -49,7 +49,7 @@ impl WndClass {
                     cbWndExtra: self.wnd_extra as INT,
                     hInstance: instance.instance,
                     hIcon: self.icon,
-                    hCursor: self.cursor,
+                    hCursor: self.cursor.cursor,
                     hbrBackground: self.background,
                     lpszMenuName: menuname_p,
                     lpszClassName: clsname_p,
@@ -68,6 +68,29 @@ impl Instance {
     pub fn main_instance() -> Instance {
         Instance {
             instance: unsafe { GetModuleHandleW(ptr::null()) as HINSTANCE },
+        }
+    }
+}
+
+pub struct Cursor {
+    cursor: HCURSOR,
+}
+
+impl Cursor {
+    pub fn null() -> Cursor {
+        Cursor {
+            cursor: ptr::mut_null(),
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn load_resource(id: int) -> Cursor {
+        let c = unsafe {
+            LoadImageW(ptr::mut_null(), std::cast::transmute(id), 2, 0, 0, 0x8000)
+        };
+
+        Cursor {
+            cursor: c,
         }
     }
 }
