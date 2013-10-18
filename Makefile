@@ -1,5 +1,5 @@
 RUSTC=rustc.exe
-SRC=win32.rs ll/all.rs window.rs
+SRC=win32.rs ll/all.rs ll/windef.rs ll/platform.rs window.rs
 
 .PHONY: all
 all: libwin32.dummy
