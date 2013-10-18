@@ -96,7 +96,6 @@ impl Cursor {
 }
 
 pub struct WindowParams {
-    class: WndClass,
     window_name: ~str,
     style: u32,
     x: int,
@@ -129,16 +128,9 @@ impl Window {
     }
 
     #[fixed_stack_segment]
-    pub fn create(instance: Instance, proc: ~WndProc, params: &WindowParams) -> Option<Window> {
-        let res = params.class.register(instance);
-        if res {
-            local_data::set(key_init_wnd, proc);
-        } else {
-            return None;
-        }
-
+    pub fn new(instance: Instance, classname: &str, params: &WindowParams) -> Option<Window> {
         let wnd = unsafe {
-            do as_utf16_p(params.class.classname) |clsname_p| {
+            do as_utf16_p(classname) |clsname_p| {
                 do as_utf16_p(params.window_name) |title_p| {
                     let wnd = CreateWindowExW(
                         params.ex_style, clsname_p, title_p, params.style,
@@ -174,6 +166,10 @@ pub trait WndProc {
     fn wnd<'a>(&'a self) -> &'a Window;
     fn wnd_mut<'a>(&'a mut self) -> &'a mut Window;
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
+}
+
+pub fn set_proc(proc: ~WndProc) {
+    local_data::set(key_init_wnd, proc);
 }
 
 pub type WindowMap = HashMap<Window, ~WndProc>;

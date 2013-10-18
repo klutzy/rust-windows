@@ -55,11 +55,6 @@ impl OnPaint for MainFrame {
 
 impl MainFrame {
     fn new(instance: Instance, title: ~str) -> Option<Window> {
-        let proc = ~MainFrame {
-            win: Window::null(),
-            title: title.clone(),
-        };
-
         let wnd_class = WndClass {
             classname: ~"MainFrame",
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
@@ -71,6 +66,16 @@ impl MainFrame {
             cls_extra: 0,
             wnd_extra: 0,
         };
+        let res = wnd_class.register(instance);
+        if !res {
+            return None;
+        }
+
+        let proc = ~MainFrame {
+            win: Window::null(),
+            title: title.clone(),
+        };
+        set_proc(proc as ~WndProc);
 
         let WS_OVERLAPPED = 0x00000000u32;
         let WS_CAPTION = 0x00C00000u32;
@@ -82,7 +87,6 @@ impl MainFrame {
                 WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
         let win_params = WindowParams {
-            class: wnd_class,
             window_name: title,
             style: WS_OVERLAPPEDWINDOW,
             x: 0,
@@ -94,7 +98,7 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::create(instance, proc as ~WndProc, &win_params)
+        Window::new(instance, wnd_class.classname, &win_params)
     }
 }
 
