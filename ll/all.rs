@@ -163,10 +163,10 @@ extern "stdcall" {
 
     pub fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
 
-    // 32-bit only
+    #[cfg(target_arch = "x86")]
     pub fn GetClassLongW(hwnd: HWND, nIndex: c_int) -> DWORD;
 
-    // 32-bit only
+    #[cfg(target_arch = "x86")]
     pub fn SetClassLongW(
             hwnd: HWND, nIndex: c_int, dwNewLong: LONG
     ) -> DWORD;
