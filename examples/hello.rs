@@ -3,6 +3,7 @@
 extern mod win32;
 
 use std::ptr;
+use std::cell::Cell;
 
 use win32::window::*;
 use win32::ll::*;
@@ -10,9 +11,34 @@ use win32::ll::*;
 struct MainFrame {
     win: Window,
     title: ~str,
+    edit: Cell<Window>,
 }
 
-impl OnCreate for MainFrame {}
+impl OnCreate for MainFrame {
+    fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
+        let params = WindowParams {
+            window_name: ~"Hello World",
+            style: WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL |
+                ES_AUTOVSCROLL | ES_MULTILINE | ES_NOHIDESEL,
+            x: 0,
+            y: 0,
+            width: 300,
+            height: 300,
+            parent: self.win,
+            menu: ptr::mut_null(),
+            ex_style: 0,
+        };
+        let edit = Window::new(Instance::main_instance(), "EDIT", &params);
+        match edit {
+            None => false,
+            Some(e) => {
+                self.edit.put_back(e);
+                true
+            }
+        }
+    }
+}
+
 impl OnDestroy for MainFrame {}
 
 impl WndProc for MainFrame {
@@ -74,17 +100,9 @@ impl MainFrame {
         let proc = ~MainFrame {
             win: Window::null(),
             title: title.clone(),
+            edit: Cell::new_empty(),
         };
         set_proc(proc as ~WndProc);
-
-        let WS_OVERLAPPED = 0x00000000u32;
-        let WS_CAPTION = 0x00C00000u32;
-        let WS_SYSMENU = 0x00080000u32;
-        let WS_THICKFRAME = 0x00040000u32;
-        let WS_MINIMIZEBOX = 0x00020000u32;
-        let WS_MAXIMIZEBOX = 0x00010000u32;
-        let WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
-                WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
         let win_params = WindowParams {
             window_name: title,
