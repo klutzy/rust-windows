@@ -82,13 +82,6 @@ pub struct MSG {
     pt: POINT,
 }
 
-pub struct RECT {
-    left: LONG,
-    top: LONG,
-    right: LONG,
-    bottom: LONG,
-}
-
 pub struct PAINTSTRUCT {
     hdc: HDC,
     fErase: BOOL,

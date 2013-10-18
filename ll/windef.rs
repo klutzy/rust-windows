@@ -72,36 +72,33 @@ pub type COLORREF = DWORD;
 pub type FARPROC = *u8;
 pub type NEARPROC = *u8;
 pub type PROC = *u8;
-pub struct Struct_tagRECT {
+pub struct RECT {
     left: LONG,
     top: LONG,
     right: LONG,
     bottom: LONG,
 }
-pub type RECT = Struct_tagRECT;
-pub type PRECT = *mut Struct_tagRECT;
-pub type LPRECT = *mut Struct_tagRECT;
+pub type PRECT = *mut RECT;
+pub type LPRECT = *mut RECT;
 pub type LPCRECT = *RECT;
-pub struct Struct_tagRECTL {
+pub struct RECTL {
     left: LONG,
     top: LONG,
     right: LONG,
     bottom: LONG,
 }
-pub type RECTL = Struct_tagRECTL;
-pub type PRECTL = *mut Struct_tagRECTL;
-pub type LPRECTL = *mut Struct_tagRECTL;
+pub type PRECTL = *mut RECTL;
+pub type LPRECTL = *mut RECTL;
 pub type LPCRECTL = *RECTL;
-pub struct Struct_tagPOINT {
+pub struct POINT {
     x: LONG,
     y: LONG,
 }
-pub type POINT = Struct_tagPOINT;
-pub type POINTL = Struct_tagPOINT;
-pub type PPOINT = *mut Struct_tagPOINT;
-pub type LPPOINT = *mut Struct_tagPOINT;
-pub type PPOINTL = *mut Struct_tagPOINT;
-pub type LPPOINTL = *mut Struct_tagPOINT;
+pub type POINTL = POINT;
+pub type PPOINT = *mut POINT;
+pub type LPPOINT = *mut POINT;
+pub type PPOINTL = *mut POINT;
+pub type LPPOINTL = *mut POINT;
 pub struct Struct_tagSIZE {
     cx: LONG,
     cy: LONG,
