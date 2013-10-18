@@ -1,8 +1,8 @@
 use ll::platform::*;
 use ll::windef::*;
 
-// extern "stdcall" pub fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
-pub type WNDPROC = *u8;
+// extern "stdcall" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
+pub type WNDPROC = *c_void;
 
 pub struct SECURITY_ATTRIBUTES {
     nLength: DWORD,
@@ -98,89 +98,82 @@ pub struct PAINTSTRUCT {
     rgbReserved: *[BYTE, ..32],
 }
 
-pub mod kernel32 {
-    use ll::*;
-    extern "stdcall" {
-        pub fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
+// kernel32
+extern "stdcall" {
+    pub fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
 
-        pub fn CreateProcessW(
-            lpApplicationName: LPCWSTR, lpCommandLine: LPWSTR,
-            lpProcessAttributes: *SECURITY_ATTRIBUTES,
-            lpThreadAttributes: *SECURITY_ATTRIBUTES,
-            bInheritHandles: BOOL,
-            dwCreationFlags: DWORD,
-            lpEnvironment: LPVOID,
-            lpCurrentDirectory: LPCWSTR,
-            lpStartupInfo: LPSTARTUPINFO,
-            lpProcessInformation: LPPROCESS_INFORMATION
-        ) -> BOOL;
-    }
+    pub fn CreateProcessW(
+        lpApplicationName: LPCWSTR, lpCommandLine: LPWSTR,
+        lpProcessAttributes: *SECURITY_ATTRIBUTES,
+        lpThreadAttributes: *SECURITY_ATTRIBUTES,
+        bInheritHandles: BOOL,
+        dwCreationFlags: DWORD,
+        lpEnvironment: LPVOID,
+        lpCurrentDirectory: LPCWSTR,
+        lpStartupInfo: LPSTARTUPINFO,
+        lpProcessInformation: LPPROCESS_INFORMATION
+    ) -> BOOL;
 }
 
-pub mod user32 {
-    use ll::*;
-    extern "stdcall" {
-        pub fn CreateWindowExW(extrastyle: DWORD, classname: LPCWSTR,
-                windowname: LPCWSTR, style: DWORD,
-                x: c_int, y: c_int, width: c_int, height: c_int,
-                parent: HWND, menu: HMENU, instance: HINSTANCE, param: LPVOID
-        ) -> HWND;
+// user32
+extern "stdcall" {
+    pub fn CreateWindowExW(extrastyle: DWORD, classname: LPCWSTR,
+            windowname: LPCWSTR, style: DWORD,
+            x: c_int, y: c_int, width: c_int, height: c_int,
+            parent: HWND, menu: HMENU, instance: HINSTANCE, param: LPVOID
+    ) -> HWND;
 
-        pub fn ShowWindow(hwnd: HWND, nCmdShow: c_int) -> BOOL;
+    pub fn ShowWindow(hwnd: HWND, nCmdShow: c_int) -> BOOL;
 
-        pub fn UpdateWindow(hwnd: HWND) -> BOOL;
+    pub fn UpdateWindow(hwnd: HWND) -> BOOL;
 
-        pub fn BeginPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> HDC;
+    pub fn BeginPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> HDC;
 
-        pub fn EndPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> BOOL;
+    pub fn EndPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> BOOL;
 
-        pub fn MessageBoxW(
-                hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT
-        ) -> c_int;
+    pub fn MessageBoxW(
+            hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT
+    ) -> c_int;
 
-        pub fn RegisterClassExW(lpwcx: *WNDCLASSEX) -> ATOM;
+    pub fn RegisterClassExW(lpwcx: *WNDCLASSEX) -> ATOM;
 
-        pub fn DefWindowProcW(
-                hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM
-        ) -> LRESULT;
+    pub fn DefWindowProcW(
+            hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM
+    ) -> LRESULT;
 
-        pub fn GetMessageW(
-                lpMsg: *MSG, hWnd: HWND,
-                wMsgFilterMin: UINT, wMsgFilterMAx: UINT
-        ) -> BOOL;
+    pub fn GetMessageW(
+            lpMsg: *MSG, hWnd: HWND,
+            wMsgFilterMin: UINT, wMsgFilterMAx: UINT
+    ) -> BOOL;
 
-        pub fn PeekMessageW(
-                lpMsg: *MSG, hWnd: HWND,
-                wMsgFilterMin: UINT, wMsgFilterMAx: UINT, wRemoveMsg: UINT
-        ) -> BOOL;
+    pub fn PeekMessageW(
+            lpMsg: *MSG, hWnd: HWND,
+            wMsgFilterMin: UINT, wMsgFilterMAx: UINT, wRemoveMsg: UINT
+    ) -> BOOL;
 
-        pub fn PostMessageW(
-                hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM
-        ) -> BOOL;
+    pub fn PostMessageW(
+            hWnd: HWND, Msg: UINT, wParam: WPARAM, lParam: LPARAM
+    ) -> BOOL;
 
-        pub fn PostQuitMessage(nExitCode: c_int);
+    pub fn PostQuitMessage(nExitCode: c_int);
 
-        pub fn TranslateMessage(lpMsg: *MSG) -> BOOL;
+    pub fn TranslateMessage(lpMsg: *MSG) -> BOOL;
 
-        pub fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
+    pub fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
 
-        // 32-bit only
-        pub fn GetClassLongW(hwnd: HWND, nIndex: c_int) -> DWORD;
+    // 32-bit only
+    pub fn GetClassLongW(hwnd: HWND, nIndex: c_int) -> DWORD;
 
-        // 32-bit only
-        pub fn SetClassLongW(
-                hwnd: HWND, nIndex: c_int, dwNewLong: LONG
-        ) -> DWORD;
-    }
+    // 32-bit only
+    pub fn SetClassLongW(
+            hwnd: HWND, nIndex: c_int, dwNewLong: LONG
+    ) -> DWORD;
 }
 
-pub mod gdi32 {
-    use ll::*;
-    #[link_args = "-lgdi32"]
-    extern "stdcall" {
-        pub fn TextOutW(
-                hdc: HDC, nXStart: c_int, nYStart: c_int,
-                lpString: LPWSTR, cchString: c_int
-        ) -> BOOL;
-    }
+// gdi32
+extern "stdcall" {
+    pub fn TextOutW(
+            hdc: HDC, nXStart: c_int, nYStart: c_int,
+            lpString: LPWSTR, cchString: c_int
+    ) -> BOOL;
 }

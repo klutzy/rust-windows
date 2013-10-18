@@ -2,6 +2,8 @@
 #[crate_type = "lib"];
 #[link(name = "win32")];
 
+#[link_args = "-lgdi32"];
+
 use std::ptr;
 
 use ll::*;
@@ -20,7 +22,7 @@ pub mod window;
 
 #[fixed_stack_segment]
 pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    unsafe { user32::DefWindowProcW(hwnd, msg, w, l) }
+    unsafe { DefWindowProcW(hwnd, msg, w, l) }
 }
 
 #[fixed_stack_segment]
@@ -35,7 +37,7 @@ pub fn main_window_loop() -> u32 {
     };
     loop {
         let ret = unsafe {
-            user32::GetMessageW(&msg as *MSG, ptr::mut_null(),
+            GetMessageW(&msg as *MSG, ptr::mut_null(),
                     0 as UINT, 0 as UINT)
         };
 
@@ -45,8 +47,8 @@ pub fn main_window_loop() -> u32 {
         }
         else {
             unsafe {
-                user32::TranslateMessage(&msg as *MSG);
-                user32::DispatchMessageW(&msg as *MSG);
+                TranslateMessage(&msg as *MSG);
+                DispatchMessageW(&msg as *MSG);
             }
         }
     }

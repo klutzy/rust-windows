@@ -44,7 +44,7 @@ impl WndClass {
                 let wcex = WNDCLASSEX {
                     cbSize: std::sys::size_of::<WNDCLASSEX>() as UINT,
                     style: self.style as UINT,
-                    lpfnWndProc: main_wnd_proc as *u8,
+                    lpfnWndProc: main_wnd_proc as *c_void,
                     cbClsExtra: self.cls_extra as INT,
                     cbWndExtra: self.wnd_extra as INT,
                     hInstance: instance.instance,
@@ -56,7 +56,7 @@ impl WndClass {
                     hIconSm: self.icon_small,
                 };
 
-                let res = unsafe { user32::RegisterClassExW(&wcex) };
+                let res = unsafe { RegisterClassExW(&wcex) };
                 res != 0
             }
         }
@@ -67,7 +67,7 @@ impl Instance {
     #[fixed_stack_segment]
     pub fn main_instance() -> Instance {
         Instance {
-            instance: unsafe { kernel32::GetModuleHandleW(ptr::null()) as HINSTANCE },
+            instance: unsafe { GetModuleHandleW(ptr::null()) as HINSTANCE },
         }
     }
 }
@@ -117,7 +117,7 @@ impl Window {
         let wnd = unsafe {
             do as_utf16_p(params.class.classname) |clsname_p| {
                 do as_utf16_p(params.window_name) |title_p| {
-                    let wnd = user32::CreateWindowExW(
+                    let wnd = CreateWindowExW(
                         params.ex_style, clsname_p, title_p, params.style,
                         params.x as c_int, params.y as c_int,
                         params.width as c_int, params.height as c_int,
@@ -138,12 +138,12 @@ impl Window {
 
     #[fixed_stack_segment]
     pub fn show(&self, cmd_show: int) -> bool {
-        unsafe { user32::ShowWindow(self.wnd, cmd_show as c_int) == 0 }
+        unsafe { ShowWindow(self.wnd, cmd_show as c_int) == 0 }
     }
 
     #[fixed_stack_segment]
     pub fn update(&self) -> bool {
-        unsafe { user32::UpdateWindow(self.wnd) == 0 }
+        unsafe { UpdateWindow(self.wnd) == 0 }
     }
 }
 
@@ -196,7 +196,7 @@ impl DialogUtil for Window {
         do as_utf16_p(msg) |msg_p| {
             do as_utf16_p(title) |title_p| {
                 unsafe {
-                    user32::MessageBoxW(self.wnd, msg_p, title_p, 0u32);
+                    MessageBoxW(self.wnd, msg_p, title_p, 0u32);
                 }
             }
         }
@@ -226,13 +226,13 @@ impl<T: WndProc> WindowPaint for T {
             rgbReserved: &rgb_res,
         };
 
-        let dc = unsafe { user32::BeginPaint(self.wnd().wnd, &ps) };
+        let dc = unsafe { BeginPaint(self.wnd().wnd, &ps) };
         (dc, ps)
     }
 
     #[fixed_stack_segment]
     fn end_paint(&self, ps: &PAINTSTRUCT) {
-        unsafe { user32::EndPaint(self.wnd().wnd, ps) };
+        unsafe { EndPaint(self.wnd().wnd, ps) };
     }
 
     #[fixed_stack_segment]
@@ -242,7 +242,7 @@ impl<T: WndProc> WindowPaint for T {
         do s16.as_mut_buf |buf, len| {
             let len = len - 1;
             let ret = unsafe {
-                gdi32::TextOutW(dc, x as c_int, y as c_int, buf, len as i32)
+                TextOutW(dc, x as c_int, y as c_int, buf, len as i32)
             };
             ret != 0
         }
@@ -259,7 +259,7 @@ pub trait OnDestroy {
     #[fixed_stack_segment]
     fn on_destroy(&self) {
         unsafe {
-            user32::PostQuitMessage(0 as c_int);
+            PostQuitMessage(0 as c_int);
         }
     }
 }
