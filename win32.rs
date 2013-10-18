@@ -21,6 +21,11 @@ pub mod ll {
 pub mod window;
 
 #[fixed_stack_segment]
+pub fn get_last_error() -> DWORD {
+    unsafe { GetLastError() }
+}
+
+#[fixed_stack_segment]
 pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
     unsafe { DefWindowProcW(hwnd, msg, w, l) }
 }

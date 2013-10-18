@@ -102,6 +102,8 @@ pub struct PAINTSTRUCT {
 extern "stdcall" {
     pub fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
 
+    pub fn GetLastError() -> DWORD;
+
     pub fn CreateProcessW(
         lpApplicationName: LPCWSTR, lpCommandLine: LPWSTR,
         lpProcessAttributes: *SECURITY_ATTRIBUTES,
