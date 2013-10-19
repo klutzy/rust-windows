@@ -178,6 +178,13 @@ extern "stdcall" {
 
     pub fn SetFocus(hwnd: HWND) -> HWND;
 
+    pub fn CreateFontW(
+        height: c_int, width: c_int, escapement: c_int, orientation: c_int,
+        weight: c_int, italic: DWORD, underline: DWORD, strikeOut: DWORD,
+        charSet: DWORD, outputPrecision: DWORD, clipPrecision: DWORD,
+        quality: DWORD, pitchAndFamily: DWORD, face: LPCWSTR
+    ) -> HFONT;
+
     pub fn SendMessageW(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT;
 }
 

@@ -33,8 +33,20 @@ impl OnCreate for MainFrame {
         match edit {
             None => false,
             Some(e) => {
-                self.edit.put_back(e);
-                true
+                let font_attr = Default::default();
+                let font = win32::font::Font::new(&font_attr);
+                debug2!("font: {:?}", font);
+                match font {
+                    None => false,
+                    Some(f) => {
+                        static WM_SETFONT: UINT = 0x0030;
+                        unsafe {
+                            e.send_message(WM_SETFONT, std::cast::transmute(f.font), 0);
+                        }
+                        self.edit.put_back(e);
+                        true
+                    }
+                }
             }
         }
     }
