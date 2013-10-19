@@ -168,6 +168,13 @@ extern "stdcall" {
         hinst: HINSTANCE, name: LPCWSTR, type_: UINT,
         xDesired: c_int, yDesired: c_int, load: UINT
     ) -> HANDLE;
+
+    pub fn GetClientRect(hwnd: HWND, rect: LPRECT) -> BOOL;
+
+    pub fn SetWindowPos(
+        hwnd: HWND, hwndInsertAfter: HWND, x: c_int, y: c_int,
+        cx: c_int, cy: c_int, flags: UINT
+    ) -> BOOL;
 }
 
 // gdi32

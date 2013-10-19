@@ -16,14 +16,15 @@ struct MainFrame {
 
 impl OnCreate for MainFrame {
     fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
+        let rect = self.win.client_rect().unwrap();
         let params = WindowParams {
             window_name: ~"Hello World",
             style: WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL |
                 ES_AUTOVSCROLL | ES_MULTILINE | ES_NOHIDESEL,
             x: 0,
             y: 0,
-            width: 300,
-            height: 300,
+            width: rect.right as int,
+            height: rect.bottom as int,
             parent: self.win,
             menu: ptr::mut_null(),
             ex_style: 0,
@@ -35,6 +36,15 @@ impl OnCreate for MainFrame {
                 self.edit.put_back(e);
                 true
             }
+        }
+    }
+}
+
+impl OnSize for MainFrame {
+    fn on_size(&self, width: int, height: int) {
+        do self.edit.with_ref |edit| {
+            // SWP_NOOWNERZORDER | SWP_NOZORDER
+            edit.set_window_pos(0, 0, width, height, 0x200 | 0x4);
         }
     }
 }
@@ -63,6 +73,13 @@ impl WndProc for MainFrame {
             self.on_destroy();
             return 0 as LRESULT;
         }
+        if msg == 0x0005 { // WM_SIZE
+            let l = l as u32;
+            let width = (l & 0xFFFF) as int;
+            let height = (l >> 16) as int;
+            self.on_size(width, height);
+            return 0 as LRESULT;
+        }
         if msg == 0x000F { // WM_PAINT
             let (dc, ps) = (*self).begin_paint();
             self.on_paint(dc);
@@ -74,9 +91,6 @@ impl WndProc for MainFrame {
 }
 
 impl OnPaint for MainFrame {
-    fn on_paint(&self, dc: HDC) {
-        (*self).text_out(dc, 0, 0, self.title);
-    }
 }
 
 impl MainFrame {

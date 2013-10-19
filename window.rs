@@ -203,6 +203,36 @@ impl Window {
     pub fn update(&self) -> bool {
         unsafe { UpdateWindow(self.wnd) == 0 }
     }
+
+    #[fixed_stack_segment]
+    pub fn client_rect(&self) -> Option<RECT> {
+        let mut rect = RECT {
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+        };
+        let res = unsafe {
+            GetClientRect(self.wnd, &mut rect as *mut RECT)
+        } != 0;
+        match res {
+            true => Some(rect),
+            false => None,
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn set_window_pos(
+        &self, x: int, y: int, width: int, height: int, flags: UINT
+    ) -> bool {
+        // TODO: hwndInsertAfter
+        unsafe {
+            SetWindowPos(
+                self.wnd, ptr::mut_null(), x as c_int, y as c_int,
+                width as c_int, height as c_int, flags
+            ) != 0
+        }
+    }
 }
 
 pub trait WndProc {
@@ -328,5 +358,10 @@ pub trait OnDestroy {
 
 pub trait OnPaint {
     fn on_paint(&self, _dc: HDC) {
+    }
+}
+
+pub trait OnSize {
+    fn on_size(&self, _width: int, _height: int) {
     }
 }
