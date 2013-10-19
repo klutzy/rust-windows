@@ -18,6 +18,7 @@ pub mod ll {
     pub mod all;
 }
 
+pub mod wchar;
 pub mod window;
 
 #[fixed_stack_segment]

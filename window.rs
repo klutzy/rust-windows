@@ -4,21 +4,7 @@ use std::ptr;
 use std;
 
 use ll::*;
-
-// XXX copy of std::os::win32::as_utf16_p
-pub fn as_utf16_p<T>(s: &str, f: &fn(*u16) -> T) -> T {
-    let mut t = s.to_utf16();
-    // Null terminate before passing on.
-    t.push(0u16);
-    t.as_imm_buf(|buf, _len| f(buf))
-}
-
-pub fn as_utf16_p_or_null<T>(s: &Option<~str>, f: &fn(*u16) -> T) -> T {
-    match s {
-        &None => f(ptr::null()),
-        &Some(ref s) => as_utf16_p(*s, f),
-    }
-}
+use wchar::*;
 
 pub struct Instance {
     instance: HINSTANCE
@@ -39,8 +25,8 @@ pub struct WndClass {
 impl WndClass {
     #[fixed_stack_segment]
     pub fn register(&self, instance: Instance) -> bool {
-        do as_utf16_p_or_null(&self.menu_name) |menuname_p| {
-            do as_utf16_p(self.classname) |clsname_p| {
+        do with_utf16_p_or_null(&self.menu_name) |menuname_p| {
+            do with_utf16_p(self.classname) |clsname_p| {
                 let wcex = WNDCLASSEX {
                     cbSize: std::sys::size_of::<WNDCLASSEX>() as UINT,
                     style: self.style as UINT,
@@ -173,8 +159,8 @@ impl Window {
     #[fixed_stack_segment]
     pub fn new(instance: Instance, classname: &str, params: &WindowParams) -> Option<Window> {
         let wnd = unsafe {
-            do as_utf16_p(classname) |clsname_p| {
-                do as_utf16_p(params.window_name) |title_p| {
+            do with_utf16_p(classname) |clsname_p| {
+                do with_utf16_p(params.window_name) |title_p| {
                     let wnd = CreateWindowExW(
                         params.ex_style, clsname_p, title_p, params.style,
                         params.x as c_int, params.y as c_int,
@@ -294,8 +280,8 @@ pub trait DialogUtil {
 impl DialogUtil for Window {
     #[fixed_stack_segment]
     fn message_box(&self, msg: &str, title: &str) {
-        do as_utf16_p(msg) |msg_p| {
-            do as_utf16_p(title) |title_p| {
+        do with_utf16_p(msg) |msg_p| {
+            do with_utf16_p(title) |title_p| {
                 unsafe {
                     MessageBoxW(self.wnd, msg_p, title_p, 0u32);
                 }
