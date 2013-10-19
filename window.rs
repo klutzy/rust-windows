@@ -228,6 +228,13 @@ impl Window {
             }
         }
     }
+
+    #[fixed_stack_segment]
+    pub fn send_message(&self, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        unsafe {
+            SendMessageW(self.wnd, msg, wparam, lparam)
+        }
+    }
 }
 
 pub trait WndProc {
