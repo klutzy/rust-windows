@@ -233,6 +233,15 @@ impl Window {
             ) != 0
         }
     }
+
+    #[fixed_stack_segment]
+    pub fn set_focus(&self) -> Window {
+        unsafe {
+            Window {
+                wnd: SetFocus(self.wnd)
+            }
+        }
+    }
 }
 
 pub trait WndProc {
@@ -363,5 +372,10 @@ pub trait OnPaint {
 
 pub trait OnSize {
     fn on_size(&self, _width: int, _height: int) {
+    }
+}
+
+pub trait OnFocus {
+    fn on_focus(&self, _prev: Window) {
     }
 }

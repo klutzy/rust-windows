@@ -175,6 +175,8 @@ extern "stdcall" {
         hwnd: HWND, hwndInsertAfter: HWND, x: c_int, y: c_int,
         cx: c_int, cy: c_int, flags: UINT
     ) -> BOOL;
+
+    pub fn SetFocus(hwnd: HWND) -> HWND;
 }
 
 // gdi32

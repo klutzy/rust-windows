@@ -51,6 +51,16 @@ impl OnSize for MainFrame {
 
 impl OnDestroy for MainFrame {}
 
+impl OnPaint for MainFrame {}
+
+impl OnFocus for MainFrame {
+    fn on_focus(&self, _w: Window) {
+        do self.edit.with_ref |edit| {
+            edit.set_focus();
+        }
+    }
+}
+
 impl WndProc for MainFrame {
     fn wnd<'a>(&'a self) -> &'a Window {
         &self.win
@@ -80,6 +90,11 @@ impl WndProc for MainFrame {
             self.on_size(width, height);
             return 0 as LRESULT;
         }
+        if msg == 0x0007 { // WM_SETFOCUS
+            let w = Window { wnd: w as HWND };
+            self.on_focus(w);
+            return 0 as LRESULT;
+        }
         if msg == 0x000F { // WM_PAINT
             let (dc, ps) = (*self).begin_paint();
             self.on_paint(dc);
@@ -88,9 +103,6 @@ impl WndProc for MainFrame {
         }
         win32::def_window_proc(self.wnd().wnd, msg, w, l)
     }
-}
-
-impl OnPaint for MainFrame {
 }
 
 impl MainFrame {
