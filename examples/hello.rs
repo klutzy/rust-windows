@@ -37,7 +37,7 @@ impl OnCreate for MainFrame {
             menu: ptr::mut_null(),
             ex_style: 0,
         };
-        let edit = Window::new(Instance::main_instance(), "EDIT", &params);
+        let edit = Window::new(Instance::main_instance(), None, "EDIT", &params);
         match edit {
             None => false,
             Some(e) => {
@@ -149,7 +149,6 @@ impl MainFrame {
             title: title.clone(),
             edit: Cell::new_empty(),
         };
-        set_proc(proc as ~WndProc);
 
         let win_params = WindowParams {
             window_name: title,
@@ -163,7 +162,7 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::new(instance, wnd_class.classname, &win_params)
+        Window::new(instance, Some(proc as ~WndProc), wnd_class.classname, &win_params)
     }
 }
 

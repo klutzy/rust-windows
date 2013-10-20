@@ -123,7 +123,16 @@ impl Window {
     }
 
     #[fixed_stack_segment]
-    pub fn new(instance: Instance, classname: &str, params: &WindowParams) -> Option<Window> {
+    pub fn new(
+        instance: Instance, proc: Option<~WndProc>, classname: &str, params: &WindowParams
+    ) -> Option<Window> {
+        match proc {
+            Some(proc) => {
+                local_data::set(key_init_wnd, proc);
+            },
+            None => {},
+        }
+
         let wnd = unsafe {
             do with_utf16_p(classname) |clsname_p| {
                 do with_utf16_p(params.window_name) |title_p| {
@@ -207,10 +216,6 @@ pub trait WndProc {
     fn wnd<'a>(&'a self) -> &'a Window;
     fn wnd_mut<'a>(&'a mut self) -> &'a mut Window;
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
-}
-
-pub fn set_proc(proc: ~WndProc) {
-    local_data::set(key_init_wnd, proc);
 }
 
 pub type WindowMap = HashMap<Window, ~WndProc>;
