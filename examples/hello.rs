@@ -10,6 +10,12 @@ use win32::instance::*;
 use win32::resource::*;
 use win32::window::*;
 
+// TODO duplicate of hello.rc
+static IDI_ICON: int = 0x101;
+static MENU_MAIN: int = 0x201;
+static MENU_NEW: int = 0x202;
+static MENU_EXIT: int = 0x203;
+
 struct MainFrame {
     win: Window,
     title: ~str,
@@ -121,7 +127,7 @@ impl WndProc for MainFrame {
 
 impl MainFrame {
     fn new(instance: Instance, title: ~str) -> Option<Window> {
-        let icon = Image::load_resource(instance, 101, IMAGE_ICON, 0, 0);
+        let icon = Image::load_resource(instance, IDI_ICON, IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
             classname: ~"MainFrame",
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
@@ -129,7 +135,7 @@ impl MainFrame {
             icon_small: None,
             cursor: Image::load_cursor_resource(32514), // hourglass
             background: (5 + 1) as HBRUSH,
-            menu_name: None,
+            menu: MenuId(MENU_MAIN),
             cls_extra: 0,
             wnd_extra: 0,
         };

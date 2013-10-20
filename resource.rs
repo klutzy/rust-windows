@@ -2,10 +2,20 @@ use std::ptr;
 use std;
 
 use ll::*;
+use wchar;
 use instance::Instance;
 
 pub trait ToHandle {
     fn to_handle(&self) -> HANDLE;
+}
+
+impl<T: ToHandle> ToHandle for Option<T> {
+    fn to_handle(&self) -> HANDLE {
+        match *self {
+            None => ptr::mut_null(),
+            Some(ref s) => s.to_handle(),
+        }
+    }
 }
 
 pub enum ImageType {
@@ -47,11 +57,20 @@ impl ToHandle for Image {
     }
 }
 
-impl ToHandle for Option<Image> {
-    fn to_handle(&self) -> HANDLE {
+pub enum MenuResource {
+    MenuName(~str),
+    MenuId(int),
+}
+
+impl MenuResource {
+    pub fn with_menu_p<T>(&self, f: &fn(*u16) -> T) -> T {
         match *self {
-            None => ptr::mut_null(),
-            Some(s) => s.to_handle(),
+            MenuName(ref s) => wchar::with_utf16_p(*s, f),
+            MenuId(id) => unsafe { f(std::cast::transmute(id)) },
         }
+    }
+
+    pub fn null() -> MenuResource {
+        MenuId(0)
     }
 }

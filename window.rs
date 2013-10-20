@@ -15,7 +15,7 @@ pub struct WndClass {
     icon_small: Option<Image>,
     cursor: Option<Image>,
     background: HBRUSH,
-    menu_name: Option<~str>,
+    menu: MenuResource,
     cls_extra: int,
     wnd_extra: int,
 }
@@ -23,7 +23,7 @@ pub struct WndClass {
 impl WndClass {
     #[fixed_stack_segment]
     pub fn register(&self, instance: Instance) -> bool {
-        do with_utf16_p_or_null(&self.menu_name) |menuname_p| {
+        do self.menu.with_menu_p |menu_p| {
             do with_utf16_p(self.classname) |clsname_p| {
                 let wcex = WNDCLASSEX {
                     cbSize: std::sys::size_of::<WNDCLASSEX>() as UINT,
@@ -35,7 +35,7 @@ impl WndClass {
                     hIcon: self.icon.to_handle(),
                     hCursor: self.cursor.to_handle(),
                     hbrBackground: self.background,
-                    lpszMenuName: menuname_p,
+                    lpszMenuName: menu_p,
                     lpszClassName: clsname_p,
                     hIconSm: self.icon_small.to_handle(),
                 };
