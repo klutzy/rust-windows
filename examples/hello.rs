@@ -122,9 +122,9 @@ impl MainFrame {
         let wnd_class = WndClass {
             classname: ~"MainFrame",
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
-            icon: ptr::mut_null(),
-            icon_small: ptr::mut_null(),
-            cursor: Cursor::load_resource(32514), // hourglass
+            icon: None,
+            icon_small: None,
+            cursor: Image::load_cursor_resource(32514), // hourglass
             background: (5 + 1) as HBRUSH,
             menu_name: None,
             cls_extra: 0,
