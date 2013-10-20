@@ -1,11 +1,11 @@
 RUSTC=rustc.exe
-SRC=win32.rs ll/all.rs ll/windef.rs ll/platform.rs window.rs
+SRC=$(wildcard *.rs) $(wildcard ll/*.rs)
 
 .PHONY: all
 all: libwin32.dummy
 
 libwin32.dummy: $(SRC)
-	$(RUSTC) --lib -o $@ $< && touch libwin32.dummy
+	$(RUSTC) --lib -o $@ win32.rs && touch libwin32.dummy
 
 .PHONY: test
 test: $(SRC)
