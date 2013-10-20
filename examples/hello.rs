@@ -119,10 +119,11 @@ impl WndProc for MainFrame {
 
 impl MainFrame {
     fn new(instance: Instance, title: ~str) -> Option<Window> {
+        let icon = Image::load_resource(instance, 101, IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
             classname: ~"MainFrame",
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
-            icon: None,
+            icon: icon,
             icon_small: None,
             cursor: Image::load_cursor_resource(32514), // hourglass
             background: (5 + 1) as HBRUSH,
