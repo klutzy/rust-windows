@@ -18,6 +18,8 @@ pub mod ll {
     pub mod all;
 }
 
+pub mod instance;
+pub mod resource;
 pub mod font;
 pub mod wchar;
 pub mod window;

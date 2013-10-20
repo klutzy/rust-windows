@@ -5,8 +5,10 @@ extern mod win32;
 use std::ptr;
 use std::cell::Cell;
 
-use win32::window::*;
 use win32::ll::*;
+use win32::instance::*;
+use win32::resource::*;
+use win32::window::*;
 
 struct MainFrame {
     win: Window,
