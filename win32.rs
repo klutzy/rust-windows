@@ -12,10 +12,12 @@ pub mod ll {
     pub use ll::platform::*;
     pub use ll::windef::*;
     pub use ll::all::*;
+    pub use ll::font::*;
 
     pub mod platform;
     pub mod windef;
     pub mod all;
+    pub mod font;
 }
 
 pub mod instance;
