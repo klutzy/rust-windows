@@ -9,6 +9,7 @@ use win32::ll::*;
 use win32::instance::*;
 use win32::resource::*;
 use win32::window::*;
+use win32::gdi::WindowPaint;
 
 // TODO duplicate of hello.rc
 static IDI_ICON: int = 0x101;
