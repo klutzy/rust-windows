@@ -124,7 +124,7 @@ impl Window {
 
     #[fixed_stack_segment]
     pub fn new(
-        instance: Instance, proc: Option<~WndProc>, classname: &str, params: &WindowParams
+        instance: Instance, proc: Option<~WindowImpl>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
         match proc {
             Some(proc) => {
@@ -212,16 +212,16 @@ impl Window {
     }
 }
 
-pub trait WndProc {
+pub trait WindowImpl {
     fn wnd<'a>(&'a self) -> &'a Window;
     fn wnd_mut<'a>(&'a mut self) -> &'a mut Window;
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
 }
 
-pub type WindowMap = HashMap<Window, ~WndProc>;
+pub type WindowMap = HashMap<Window, ~WindowImpl>;
 
 local_data_key!(pub key_win_map: WindowMap)
-local_data_key!(pub key_init_wnd: ~WndProc)
+local_data_key!(pub key_init_wnd: ~WindowImpl)
 
 pub fn init_window_map() {
     let win_map: WindowMap = HashMap::new();

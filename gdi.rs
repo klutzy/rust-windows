@@ -9,7 +9,7 @@ pub trait WindowPaint {
     fn text_out(&self, dc: HDC, x: int, y: int, s: &str) -> bool;
 }
 
-impl<T: WndProc> WindowPaint for T {
+impl<T: WindowImpl> WindowPaint for T {
     #[fixed_stack_segment]
     fn begin_paint(&self) -> (HDC, PAINTSTRUCT) {
         // TODO params

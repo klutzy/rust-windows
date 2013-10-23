@@ -82,7 +82,7 @@ impl OnFocus for MainFrame {
     }
 }
 
-impl WndProc for MainFrame {
+impl WindowImpl for MainFrame {
     fn wnd<'a>(&'a self) -> &'a Window {
         &self.win
     }
@@ -163,7 +163,7 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::new(instance, Some(proc as ~WndProc), wnd_class.classname, &win_params)
+        Window::new(instance, Some(proc as ~WindowImpl), wnd_class.classname, &win_params)
     }
 }
 
