@@ -26,7 +26,7 @@ impl WndClass {
         do self.menu.with_menu_p |menu_p| {
             do with_utf16_p(self.classname) |clsname_p| {
                 let wcex = WNDCLASSEX {
-                    cbSize: std::sys::size_of::<WNDCLASSEX>() as UINT,
+                    cbSize: std::mem::size_of::<WNDCLASSEX>() as UINT,
                     style: self.style as UINT,
                     lpfnWndProc: main_wnd_proc as *c_void,
                     cbClsExtra: self.cls_extra as INT,
