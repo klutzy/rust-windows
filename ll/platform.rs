@@ -3,6 +3,7 @@ pub use std::libc::types::os::arch::extra::*;
 
 // small portion from winnt.h
 pub type LONG = c_long;
+pub type ULONG = c_ulong;
 pub type SHORT = c_short;
 
 pub type PVOID = *c_void;
