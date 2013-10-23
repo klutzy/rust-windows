@@ -229,7 +229,7 @@ pub fn init_window_map() {
 }
 
 pub extern "stdcall" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    debug2!("main_wnd_proc: wnd {:?} / msg 0x{:x} / w {:?} / l {:?}", wnd, msg as uint, w, l);
+    debug!("main_wnd_proc: wnd {:?} / msg 0x{:x} / w {:?} / l {:?}", wnd, msg as uint, w, l);
     let win = Window { wnd: wnd };
     let null_proc = local_data::pop(key_init_wnd);
     match null_proc {

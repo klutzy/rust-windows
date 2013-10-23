@@ -43,7 +43,7 @@ impl OnCreate for MainFrame {
             Some(e) => {
                 let font_attr = Default::default();
                 let font = win32::font::Font::new(&font_attr);
-                debug2!("font: {:?}", font);
+                debug!("font: {:?}", font);
                 match font {
                     None => false,
                     Some(f) => {
