@@ -20,8 +20,8 @@ impl<T: ToHandle> ToHandle for Option<T> {
 
 pub enum ImageType {
     IMAGE_BITMAP = 0,
-    IMAGE_CURSOR = 1,
-    IMAGE_ICON = 2,
+    IMAGE_ICON = 1,
+    IMAGE_CURSOR = 2,
 }
 
 pub struct Image {
