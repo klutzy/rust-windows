@@ -26,6 +26,7 @@ pub mod font;
 pub mod wchar;
 pub mod window;
 pub mod gdi;
+pub mod dialog;
 
 #[fixed_stack_segment]
 pub fn get_last_error() -> DWORD {
