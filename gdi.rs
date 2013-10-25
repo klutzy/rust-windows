@@ -3,16 +3,18 @@ use std::ptr;
 use ll::*;
 use window::*;
 
-pub trait WindowPaint {
-    fn begin_paint(&self) -> (HDC, PAINTSTRUCT);
-    fn end_paint(&self, ps: &PAINTSTRUCT);
-    fn text_out(&self, dc: HDC, x: int, y: int, s: &str) -> bool;
+pub trait OnPaint {
+    fn on_paint(&self, _dc: HDC) {
+    }
 }
 
-impl<T: WindowImpl> WindowPaint for T {
+pub trait PaintChunk {
+    fn do_paint(&self, w: WPARAM, l: LPARAM) -> LRESULT;
+}
+
+impl<T: WindowImpl + OnPaint> PaintChunk for T {
     #[fixed_stack_segment]
-    fn begin_paint(&self) -> (HDC, PAINTSTRUCT) {
-        // TODO params
+    fn do_paint(&self, _w: WPARAM, _l: LPARAM) -> LRESULT {
         let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
         let ps = PAINTSTRUCT {
             hdc: ptr::mut_null(),
@@ -27,14 +29,20 @@ impl<T: WindowImpl> WindowPaint for T {
         };
 
         let dc = unsafe { BeginPaint(self.wnd().wnd, &ps) };
-        (dc, ps)
-    }
 
-    #[fixed_stack_segment]
-    fn end_paint(&self, ps: &PAINTSTRUCT) {
-        unsafe { EndPaint(self.wnd().wnd, ps) };
-    }
+        self.on_paint(dc);
 
+        unsafe { EndPaint(self.wnd().wnd, &ps) };
+
+        0 as LRESULT
+    }
+}
+
+pub trait PaintUtil {
+    fn text_out(&self, dc: HDC, x: int, y: int, s: &str) -> bool;
+}
+
+impl<T: WindowImpl> PaintUtil for T {
     #[fixed_stack_segment]
     fn text_out(&self, dc: HDC, x: int, y: int, s: &str) -> bool {
         let mut s16 = s.to_utf16();

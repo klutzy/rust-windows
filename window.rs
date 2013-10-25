@@ -251,6 +251,21 @@ pub extern "stdcall" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM
     }
 }
 
+pub trait CreateChunk {
+    fn do_create(&self, w: WPARAM, l: LPARAM) -> LRESULT;
+}
+
+impl<T: WindowImpl + OnCreate> CreateChunk for T {
+    fn do_create(&self, w: WPARAM, l: LPARAM) -> LRESULT {
+        let cs = unsafe {
+            let pcs = std::cast::transmute::<LPARAM, *CREATESTRUCT>(l);
+            &(*pcs)
+        };
+        let ret = self.on_create(cs);
+        if ret { 0 as LRESULT } else { -1 as LRESULT }
+    }
+}
+
 pub trait OnCreate {
     fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
         true
@@ -263,11 +278,6 @@ pub trait OnDestroy {
         unsafe {
             PostQuitMessage(0 as c_int);
         }
-    }
-}
-
-pub trait OnPaint {
-    fn on_paint(&self, _dc: HDC) {
     }
 }
 

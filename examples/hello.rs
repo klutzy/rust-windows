@@ -93,12 +93,7 @@ impl WindowImpl for MainFrame {
 
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
         if msg == 0x0001 { // WM_CREATE
-            let cs = unsafe {
-                let pcs = std::cast::transmute::<LPARAM, *CREATESTRUCT>(l);
-                &(*pcs)
-            };
-            let ret = self.on_create(cs);
-            return if ret { 0 as LRESULT } else { -1 as LRESULT };
+            self.do_create(w, l)
         }
         if msg == 0x0002 { // WM_DESTROY
             self.on_destroy();
@@ -117,10 +112,7 @@ impl WindowImpl for MainFrame {
             return 0 as LRESULT;
         }
         if msg == 0x000F { // WM_PAINT
-            let (dc, ps) = (*self).begin_paint();
-            self.on_paint(dc);
-            (*self).end_paint(&ps);
-            return 0 as LRESULT;
+            self.do_paint(w, l)
         }
         win32::def_window_proc(self.wnd().wnd, msg, w, l)
     }
