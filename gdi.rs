@@ -1,6 +1,7 @@
 use std::ptr;
 
 use ll::*;
+use font::Font;
 use window::WindowImpl;
 
 // TODO: allocated DC (CreateDC/ReleaseDC)
@@ -19,6 +20,16 @@ impl Dc {
                 TextOutW(self.dc, x as c_int, y as c_int, buf, len as i32)
             };
             ret != 0
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn select_font(&self, font: &Font) -> Option<Font> {
+        let res = unsafe { SelectObject(self.dc, font.font as HGDIOBJ) };
+        if res.is_null() {
+            None
+        } else {
+            Some(Font { font: res })
         }
     }
 }

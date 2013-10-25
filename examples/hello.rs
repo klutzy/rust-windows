@@ -10,6 +10,7 @@ use win32::instance::*;
 use win32::resource::*;
 use win32::window::*;
 use win32::gdi::WindowPaint;
+use win32::font::Font;
 
 // TODO duplicate of hello.rc
 static IDI_ICON: int = 0x101;
@@ -22,6 +23,7 @@ struct MainFrame {
     title: ~str,
     text_height: int,
     edit: Cell<Window>,
+    font: Cell<Font>,
 }
 
 impl OnCreate for MainFrame {
@@ -54,6 +56,7 @@ impl OnCreate for MainFrame {
                             e.send_message(WM_SETFONT, std::cast::transmute(f.font), 0);
                         }
                         self.edit.put_back(e);
+                        self.font.put_back(f);
                         true
                     }
                 }
@@ -76,9 +79,12 @@ impl OnDestroy for MainFrame {}
 
 impl OnPaint for MainFrame {
     fn on_paint(&self) {
-        do self.with_paint_dc |dc| {
-            dc.text_out(0, 0, self.title);
-        };
+        do self.font.with_ref |font| {
+            do self.with_paint_dc |dc| {
+                dc.select_font(font);
+                dc.text_out(0, 0, self.title);
+            };
+        }
     }
 }
 
@@ -156,6 +162,7 @@ impl MainFrame {
             title: title.clone(),
             text_height: text_height,
             edit: Cell::new_empty(),
+            font: Cell::new_empty(),
         };
 
         let win_params = WindowParams {

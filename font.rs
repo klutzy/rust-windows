@@ -121,6 +121,14 @@ pub struct Font {
     font: HFONT,
 }
 
+impl Clone for Font {
+    fn clone(&self) -> Font {
+        Font {
+            font: self.font,
+        }
+    }
+}
+
 impl Font {
     #[fixed_stack_segment]
     pub fn new(attr: &FontAttr) -> Option<Font> {

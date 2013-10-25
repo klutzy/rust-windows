@@ -179,4 +179,6 @@ extern "stdcall" {
     pub fn SetFocus(hwnd: HWND) -> HWND;
 
     pub fn SendMessageW(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT;
+
+    pub fn SelectObject(hdc: HDC, hgdiobj: HGDIOBJ) -> HGDIOBJ;
 }
