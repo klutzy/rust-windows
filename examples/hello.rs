@@ -20,6 +20,7 @@ static MENU_EXIT: int = 0x203;
 struct MainFrame {
     win: Window,
     title: ~str,
+    text_height: int,
     edit: Cell<Window>,
 }
 
@@ -31,9 +32,9 @@ impl OnCreate for MainFrame {
             style: WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL |
                 ES_AUTOVSCROLL | ES_MULTILINE | ES_NOHIDESEL,
             x: 0,
-            y: 0,
+            y: self.text_height,
             width: rect.right as int,
-            height: rect.bottom as int,
+            height: rect.bottom as int - self.text_height,
             parent: self.win,
             menu: ptr::mut_null(),
             ex_style: 0,
@@ -65,14 +66,21 @@ impl OnSize for MainFrame {
     fn on_size(&self, width: int, height: int) {
         do self.edit.with_ref |edit| {
             // SWP_NOOWNERZORDER | SWP_NOZORDER
-            edit.set_window_pos(0, 0, width, height, 0x200 | 0x4);
+            let h = self.text_height;
+            edit.set_window_pos(0, h, width, height - h, 0x200 | 0x4);
         }
     }
 }
 
 impl OnDestroy for MainFrame {}
 
-impl OnPaint for MainFrame {}
+impl OnPaint for MainFrame {
+    fn on_paint(&self) {
+        do self.with_paint_dc |dc| {
+            dc.text_out(0, 0, self.title);
+        };
+    }
+}
 
 impl OnFocus for MainFrame {
     fn on_focus(&self, _w: Window) {
@@ -117,9 +125,7 @@ impl WindowImpl for MainFrame {
             return 0 as LRESULT;
         }
         if msg == 0x000F { // WM_PAINT
-            let (dc, ps) = (*self).begin_paint();
-            self.on_paint(dc);
-            (*self).end_paint(&ps);
+            self.on_paint();
             return 0 as LRESULT;
         }
         win32::def_window_proc(self.wnd().wnd, msg, w, l)
@@ -127,7 +133,7 @@ impl WindowImpl for MainFrame {
 }
 
 impl MainFrame {
-    fn new(instance: Instance, title: ~str) -> Option<Window> {
+    fn new(instance: Instance, title: ~str, text_height: int) -> Option<Window> {
         let icon = Image::load_resource(instance, IDI_ICON, IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
             classname: ~"MainFrame",
@@ -148,6 +154,7 @@ impl MainFrame {
         let proc = ~MainFrame {
             win: Window::null(),
             title: title.clone(),
+            text_height: text_height,
             edit: Cell::new_empty(),
         };
 
@@ -171,7 +178,7 @@ fn main() {
     init_window_map();
 
     let instance = Instance::main_instance();
-    let main = MainFrame::new(instance, ~"Hello");
+    let main = MainFrame::new(instance, ~"Hello Rust", 20);
     let main = main.unwrap();
 
     main.show(1);

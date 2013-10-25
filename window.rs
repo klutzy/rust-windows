@@ -267,7 +267,7 @@ pub trait OnDestroy {
 }
 
 pub trait OnPaint {
-    fn on_paint(&self, _dc: HDC) {
+    fn on_paint(&self) {
     }
 }
 
