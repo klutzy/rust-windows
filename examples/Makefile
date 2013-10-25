@@ -2,7 +2,7 @@ RUSTC=rustc.exe
 SRC=hello.rs
 RES=hello.rc
 EXE=$(patsubst %.rs, %.exe, $(SRC))
-OBJ=$(patsubst %.rs, %.o, $(SRC)) $(patsubst %.rc, %.rc.o, $(RES))
+RC=$(patsubst %.rc, %.rc.o, $(RES))
 
 .SUFFIXES:
 
@@ -17,4 +17,4 @@ all: $(EXE)
 
 .PHONY: clean
 clean:
-	rm -rf $(EXE) $(OBJ)
+	rm -rf $(EXE) $(RC)
