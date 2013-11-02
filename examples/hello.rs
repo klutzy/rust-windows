@@ -157,7 +157,7 @@ impl MainFrame {
             return None;
         }
 
-        let proc = ~MainFrame {
+        let wproc = ~MainFrame {
             win: Window::null(),
             title: title.clone(),
             text_height: text_height,
@@ -177,7 +177,7 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::new(instance, Some(proc as ~WindowImpl), wnd_class.classname, &win_params)
+        Window::new(instance, Some(wproc as ~WindowImpl), wnd_class.classname, &win_params)
     }
 }
 

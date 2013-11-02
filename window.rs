@@ -124,11 +124,11 @@ impl Window {
 
     #[fixed_stack_segment]
     pub fn new(
-        instance: Instance, proc: Option<~WindowImpl>, classname: &str, params: &WindowParams
+        instance: Instance, wproc: Option<~WindowImpl>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
-        match proc {
-            Some(proc) => {
-                local_data::set(key_init_wnd, proc);
+        match wproc {
+            Some(wproc) => {
+                local_data::set(key_init_wnd, wproc);
             },
             None => {},
         }
@@ -246,8 +246,8 @@ pub extern "stdcall" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM
     };
     do local_data::get(key_win_map) |wmap| {
         let wmap = wmap.unwrap();
-        let proc = wmap.find(&win).unwrap();
-        proc.wnd_proc(msg, w, l)
+        let wproc = wmap.find(&win).unwrap();
+        wproc.wnd_proc(msg, w, l)
     }
 }
 
