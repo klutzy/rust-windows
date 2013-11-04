@@ -132,7 +132,7 @@ impl Clone for Font {
 impl Font {
     #[fixed_stack_segment]
     pub fn new(attr: &FontAttr) -> Option<Font> {
-        let hfont = do with_utf16_p_or_null(&attr.face) |face| {
+        let hfont = do attr.face.with_c_u16_str |face| {
             unsafe {
                 CreateFontW(
                     attr.height as c_int,

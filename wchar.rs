@@ -1,16 +1,26 @@
 use std::ptr;
 
-// XXX copy of std::os::win32::as_utf16_p
-pub fn with_utf16_p<T>(s: &str, f: &fn(*u16) -> T) -> T {
-    let mut t = s.to_utf16();
-    // Null terminate before passing on.
-    t.push(0u16);
-    t.as_imm_buf(|buf, _len| f(buf))
+/// A generic trait for converting a value to a `CU16String`, like `ToCStr`.
+pub trait ToCU16Str {
+    fn with_c_u16_str<T>(&self, f: &fn(*u16) -> T) -> T;
 }
 
-pub fn with_utf16_p_or_null<T>(s: &Option<~str>, f: &fn(*u16) -> T) -> T {
-    match s {
-        &None => f(ptr::null()),
-        &Some(ref s) => with_utf16_p(*s, f),
+impl<'self> ToCU16Str for &'self str {
+    fn with_c_u16_str<T>(&self, f: &fn(*u16) -> T) -> T {
+        let mut t = self.to_utf16();
+        // Null terminate before passing on.
+        t.push(0u16);
+        t.as_imm_buf(|buf, _len| f(buf))
+    }
+}
+
+impl<S: Str> ToCU16Str for Option<S> {
+    fn with_c_u16_str<T>(&self, f: &fn(*u16) -> T) -> T {
+        match self {
+            &None => f(ptr::null()),
+            &Some(ref s) => {
+                s.as_slice().with_c_u16_str(f)
+            },
+        }
     }
 }

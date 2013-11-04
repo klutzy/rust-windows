@@ -24,7 +24,7 @@ impl WndClass {
     #[fixed_stack_segment]
     pub fn register(&self, instance: Instance) -> bool {
         do self.menu.with_menu_p |menu_p| {
-            do with_utf16_p(self.classname) |clsname_p| {
+            do self.classname.with_c_u16_str |clsname_p| {
                 let wcex = WNDCLASSEX {
                     cbSize: std::mem::size_of::<WNDCLASSEX>() as UINT,
                     style: self.style as UINT,
@@ -134,8 +134,8 @@ impl Window {
         }
 
         let wnd = unsafe {
-            do with_utf16_p(classname) |clsname_p| {
-                do with_utf16_p(params.window_name) |title_p| {
+            do classname.with_c_u16_str |clsname_p| {
+                do params.window_name.with_c_u16_str |title_p| {
                     let wnd = CreateWindowExW(
                         params.ex_style, clsname_p, title_p, params.style,
                         params.x as c_int, params.y as c_int,

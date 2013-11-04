@@ -2,7 +2,7 @@ use std::ptr;
 use std;
 
 use ll::*;
-use wchar;
+use wchar::ToCU16Str;
 use instance::Instance;
 
 pub trait ToHandle {
@@ -65,7 +65,7 @@ pub enum MenuResource {
 impl MenuResource {
     pub fn with_menu_p<T>(&self, f: &fn(*u16) -> T) -> T {
         match *self {
-            MenuName(ref s) => wchar::with_utf16_p(*s, f),
+            MenuName(ref s) => s.as_slice().with_c_u16_str(f),
             MenuId(id) => unsafe { f(std::cast::transmute(id)) },
         }
     }
