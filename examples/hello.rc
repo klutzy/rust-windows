@@ -1,7 +1,11 @@
+#include "winuser.h"
+
 #define IDI_ICON 0x101
 #define MENU_MAIN 0x201
 #define MENU_NEW 0x202
 #define MENU_EXIT 0x203
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "hello.exe.manifest"
 
 IDI_ICON ICON "hello.ico"
 
