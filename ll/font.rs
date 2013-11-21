@@ -1,7 +1,7 @@
 use ll::platform::*;
 use ll::windef::*;
 
-extern "stdcall" {
+extern "system" {
     pub fn CreateFontW(
         height: c_int, width: c_int, escapement: c_int, orientation: c_int,
         weight: c_int, italic: DWORD, underline: DWORD, strikeOut: DWORD,

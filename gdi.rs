@@ -10,7 +10,6 @@ pub struct Dc {
 }
 
 impl Dc {
-    #[fixed_stack_segment]
     pub fn text_out(&self, x: int, y: int, s: &str) -> bool {
         let mut s16 = s.to_utf16();
         s16.push(0u16);
@@ -23,7 +22,6 @@ impl Dc {
         }
     }
 
-    #[fixed_stack_segment]
     pub fn select_font(&self, font: &Font) -> Option<Font> {
         let res = unsafe { SelectObject(self.dc, font.font as HGDIOBJ) };
         if res.is_null() {
@@ -40,7 +38,6 @@ pub trait WindowPaint {
 }
 
 impl<T: WindowImpl> WindowPaint for T {
-    #[fixed_stack_segment]
     fn with_paint_dc<T>(&self, f: &fn(Dc) -> T) -> T {
         let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
         let ps = PAINTSTRUCT {

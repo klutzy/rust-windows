@@ -96,7 +96,6 @@ impl ToStr for CU16String {
 
 impl Drop for CU16String {
     fn drop(&mut self) {
-        #[fixed_stack_segment]; #[inline(never)];
         if self.owns_buffer_ {
             unsafe {
                 libc::free(self.buf as *libc::c_void)

@@ -68,17 +68,14 @@ pub fn env() -> ~[(~str,~str)] {
     }
 }
 
-#[fixed_stack_segment]
 pub fn get_last_error() -> DWORD {
     unsafe { GetLastError() }
 }
 
-#[fixed_stack_segment]
 pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
     unsafe { DefWindowProcW(hwnd, msg, w, l) }
 }
 
-#[fixed_stack_segment]
 pub fn main_window_loop() -> u32 {
     let msg = MSG {
         hwnd: ptr::mut_null(),

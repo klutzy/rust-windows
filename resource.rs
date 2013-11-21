@@ -29,7 +29,6 @@ pub struct Image {
 }
 
 impl Image {
-    #[fixed_stack_segment]
     pub fn load_resource(instance: Instance, id: int, img_type: ImageType, width: int, height: int) -> Option<Image> {
         let img = unsafe {
             LoadImageW(

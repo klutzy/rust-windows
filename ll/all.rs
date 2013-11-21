@@ -1,7 +1,7 @@
 use ll::platform::*;
 use ll::windef::*;
 
-// extern "stdcall" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
+// extern "system" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
 pub type WNDPROC = *c_void;
 
 pub struct SECURITY_ATTRIBUTES {
@@ -92,7 +92,7 @@ pub struct PAINTSTRUCT {
 }
 
 // kernel32
-extern "stdcall" {
+extern "system" {
     pub fn GetModuleHandleW(lpModuleName: LPCWSTR) -> HMODULE;
 
     pub fn GetLastError() -> DWORD;
@@ -111,7 +111,7 @@ extern "stdcall" {
 }
 
 // user32
-extern "stdcall" {
+extern "system" {
     pub fn CreateWindowExW(extrastyle: DWORD, classname: LPCWSTR,
             windowname: LPCWSTR, style: DWORD,
             x: c_int, y: c_int, width: c_int, height: c_int,

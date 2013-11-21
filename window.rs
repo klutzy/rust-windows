@@ -21,7 +21,6 @@ pub struct WndClass {
 }
 
 impl WndClass {
-    #[fixed_stack_segment]
     pub fn register(&self, instance: Instance) -> bool {
         do self.menu.with_menu_p |menu_p| {
             do self.classname.with_c_u16_str |clsname_p| {
@@ -122,7 +121,6 @@ impl Window {
         }
     }
 
-    #[fixed_stack_segment]
     pub fn new(
         instance: Instance, wproc: Option<~WindowImpl>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
@@ -155,17 +153,14 @@ impl Window {
         }
     }
 
-    #[fixed_stack_segment]
     pub fn show(&self, cmd_show: int) -> bool {
         unsafe { ShowWindow(self.wnd, cmd_show as c_int) == 0 }
     }
 
-    #[fixed_stack_segment]
     pub fn update(&self) -> bool {
         unsafe { UpdateWindow(self.wnd) == 0 }
     }
 
-    #[fixed_stack_segment]
     pub fn client_rect(&self) -> Option<RECT> {
         let mut rect = RECT {
             left: 0,
@@ -182,7 +177,6 @@ impl Window {
         }
     }
 
-    #[fixed_stack_segment]
     pub fn set_window_pos(
         &self, x: int, y: int, width: int, height: int, flags: UINT
     ) -> bool {
@@ -195,7 +189,6 @@ impl Window {
         }
     }
 
-    #[fixed_stack_segment]
     pub fn set_focus(&self) -> Window {
         unsafe {
             Window {
@@ -204,7 +197,6 @@ impl Window {
         }
     }
 
-    #[fixed_stack_segment]
     pub fn send_message(&self, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
         unsafe {
             SendMessageW(self.wnd, msg, wparam, lparam)
@@ -228,7 +220,7 @@ pub fn init_window_map() {
     local_data::set(key_win_map, win_map);
 }
 
-pub extern "stdcall" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
+pub extern "system" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
     debug!("main_wnd_proc: wnd {:?} / msg 0x{:x} / w {:?} / l {:?}", wnd, msg as uint, w, l);
     let win = Window { wnd: wnd };
     let null_proc = local_data::pop(key_init_wnd);
@@ -258,7 +250,6 @@ pub trait OnCreate {
 }
 
 pub trait OnDestroy {
-    #[fixed_stack_segment]
     fn on_destroy(&self) {
         unsafe {
             PostQuitMessage(0 as c_int);
