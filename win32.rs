@@ -28,6 +28,46 @@ pub mod window;
 pub mod gdi;
 pub mod dialog;
 
+/// Returns a vector of (variable, value) pairs for all the environment
+/// variables of the current process.
+/// This is unicode-version of `std::os::env()`.
+pub fn env() -> ~[(~str,~str)] {
+    unsafe {
+        unsafe fn get_env_pairs() -> ~[~str] {
+            extern "system" {
+                fn GetEnvironmentStringsW() -> *u16;
+                fn FreeEnvironmentStringsW(ch: *u16) -> std::libc::BOOL;
+            }
+
+            let ch = GetEnvironmentStringsW();
+            if (ch as uint == 0) {
+                fail!("os::env() failure getting env string from OS: {}",
+                       std::os::last_os_error());
+            }
+            let mut result = ~[];
+            do wchar::from_c_u16_multistring(ch as *u16, None) |cstr| {
+                result.push(cstr.to_str());
+            };
+            FreeEnvironmentStringsW(ch);
+            result
+        }
+
+        fn env_convert(input: ~[~str]) -> ~[(~str, ~str)] {
+            let mut pairs = ~[];
+            for p in input.iter() {
+                let vs: ~[&str] = p.splitn_iter('=', 1).collect();
+                debug!("splitting: vs: {:?} len: {}", vs, vs.len());
+                assert_eq!(vs.len(), 2);
+                pairs.push((vs[0].to_owned(), vs[1].to_owned()));
+            }
+            pairs
+        }
+        let unparsed_environ = get_env_pairs();
+        debug!("unp: {:?}", unparsed_environ);
+        env_convert(unparsed_environ)
+    }
+}
+
 #[fixed_stack_segment]
 pub fn get_last_error() -> DWORD {
     unsafe { GetLastError() }
