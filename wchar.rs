@@ -61,22 +61,15 @@ impl CU16String {
     pub fn owns_buffer(&self) -> bool {
         self.owns_buffer_
     }
+}
 
+impl CU16String {
     /// Converts the CU16String into a `&[u8]` without copying.
     ///
     /// # Failure
     ///
     /// Fails if the CU16String is null.
     #[inline]
-    pub fn as_bytes<'a>(&'a self) -> &'a [u8] {
-        if self.buf.is_null() { fail!("CU16String is null!"); }
-        unsafe {
-            cast::transmute((self.buf, self.len() + 1))
-        }
-    }
-}
-
-impl CU16String {
     pub fn as_u16_vec<'a>(&'a self) -> &'a [u16] {
         if self.buf.is_null() { fail!("CU16String is null!"); }
         unsafe {
@@ -160,7 +153,22 @@ impl<S: Str> ToCU16Str for Option<S> {
 
 #[cfg(test)]
 mod test {
+    use super::CU16String;
     use super::from_c_u16_multistring;
+
+    #[test]
+    fn test_as_u16_vec() {
+        let u16s: &[u16] = [
+            0xac00, 0x20, 0xac00, 0x00,
+        ];
+
+        do u16s.as_imm_buf |buf, _len| {
+            let cu = unsafe { CU16String::new(buf, false) };
+            let v = cu.as_u16_vec();
+            debug!("v: {:?}", v);
+            assert_eq!(v, u16s);
+        }
+    }
 
     #[test]
     fn test_from_c_u16_multistring() {
