@@ -1,11 +1,13 @@
 RUSTC=rustc.exe
+RUST_OPTS=
 SRC=$(wildcard *.rs) $(wildcard ll/*.rs)
 
 .PHONY: all
 all: libwin32.dummy
 
 libwin32.dummy: $(SRC)
-	$(RUSTC) --lib -o $@ win32.rs && touch libwin32.dummy
+	$(RUSTC) --lib -o $@ win32.rs $(RUST_OPTS)
+	touch libwin32.dummy
 
 .PHONY: test
 test: $(SRC)
@@ -14,7 +16,7 @@ test: $(SRC)
 
 .PHONY: examples
 examples: libwin32.dummy
-	$(MAKE) -C examples
+	$(MAKE) -C examples RUST_OPTS="$(RUST_OPTS)"
 
 
 .PHONY: clean
