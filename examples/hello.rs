@@ -3,7 +3,7 @@
 extern mod win32;
 
 use std::ptr;
-use std::cell::Cell;
+use std::cell::RefCell;
 
 use win32::ll::*;
 use win32::instance::*;
@@ -25,8 +25,8 @@ struct MainFrame {
     win: Window,
     title: ~str,
     text_height: int,
-    edit: Cell<Window>,
-    font: Cell<Font>,
+    edit: RefCell<Option<Window>>,
+    font: RefCell<Option<Font>>,
 }
 
 wnd_proc!(MainFrame, win, WM_CREATE, WM_DESTROY, WM_SIZE, WM_SETFOCUS, WM_PAINT)
@@ -60,8 +60,8 @@ impl OnCreate for MainFrame {
                         unsafe {
                             e.send_message(WM_SETFONT, std::cast::transmute(f.font), 0);
                         }
-                        self.edit.put_back(e);
-                        self.font.put_back(f);
+                        self.edit.with_mut(|r| {*r = Some(e);});
+                        self.font.with_mut(|r| {*r = Some(f);});
                         true
                     }
                 }
@@ -72,11 +72,11 @@ impl OnCreate for MainFrame {
 
 impl OnSize for MainFrame {
     fn on_size(&self, width: int, height: int) {
-        do self.edit.with_ref |edit| {
+        self.edit.with(|edit| {
             // SWP_NOOWNERZORDER | SWP_NOZORDER
             let h = self.text_height;
-            edit.set_window_pos(0, h, width, height - h, 0x200 | 0x4);
-        }
+            edit.unwrap().set_window_pos(0, h, width, height - h, 0x200 | 0x4);
+        })
     }
 }
 
@@ -84,20 +84,20 @@ impl OnDestroy for MainFrame {}
 
 impl OnPaint for MainFrame {
     fn on_paint(&self) {
-        do self.font.with_ref |font| {
-            do self.with_paint_dc |dc| {
-                dc.select_font(font);
+        self.font.with(|font| {
+            self.with_paint_dc(|dc| {
+                dc.select_font(&font.unwrap());
                 dc.text_out(0, 0, self.title);
-            };
-        }
+            });
+        })
     }
 }
 
 impl OnFocus for MainFrame {
     fn on_focus(&self, _w: Window) {
-        do self.edit.with_ref |edit| {
-            edit.set_focus();
-        }
+        self.edit.with(|edit| {
+            edit.unwrap().set_focus();
+        })
     }
 }
 
@@ -124,8 +124,8 @@ impl MainFrame {
             win: Window::null(),
             title: title.clone(),
             text_height: text_height,
-            edit: Cell::new_empty(),
-            font: Cell::new_empty(),
+            edit: RefCell::new(None),
+            font: RefCell::new(None),
         };
 
         let win_params = WindowParams {

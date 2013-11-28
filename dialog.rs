@@ -8,13 +8,13 @@ pub trait DialogUtil {
 
 impl DialogUtil for Window {
     fn message_box(&self, msg: &str, title: &str) {
-        do msg.with_c_u16_str |msg_p| {
-            do title.with_c_u16_str |title_p| {
+        msg.with_c_u16_str(|msg_p| {
+            title.with_c_u16_str(|title_p| {
                 unsafe {
                     MessageBoxW(self.wnd, msg_p, title_p, 0u32);
                 }
-            }
-        }
+            })
+        })
     }
 }
 

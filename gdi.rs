@@ -13,13 +13,13 @@ impl Dc {
     pub fn text_out(&self, x: int, y: int, s: &str) -> bool {
         let mut s16 = s.to_utf16();
         s16.push(0u16);
-        do s16.as_mut_buf |buf, len| {
+        s16.as_mut_buf(|buf, len| {
             let len = len - 1;
             let ret = unsafe {
                 TextOutW(self.dc, x as c_int, y as c_int, buf, len as i32)
             };
             ret != 0
-        }
+        })
     }
 
     pub fn select_font(&self, font: &Font) -> Option<Font> {
@@ -34,11 +34,11 @@ impl Dc {
 
 // TODO better name
 pub trait WindowPaint {
-    fn with_paint_dc<T>(&self, f: &fn(Dc) -> T) -> T;
+    fn with_paint_dc<T>(&self, f: |Dc| -> T) -> T;
 }
 
 impl<T: WindowImpl> WindowPaint for T {
-    fn with_paint_dc<T>(&self, f: &fn(Dc) -> T) -> T {
+    fn with_paint_dc<T>(&self, f: |Dc| -> T) -> T {
         let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
         let ps = PAINTSTRUCT {
             hdc: ptr::mut_null(),

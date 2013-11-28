@@ -22,8 +22,8 @@ pub struct WndClass {
 
 impl WndClass {
     pub fn register(&self, instance: Instance) -> bool {
-        do self.menu.with_menu_p |menu_p| {
-            do self.classname.with_c_u16_str |clsname_p| {
+        self.menu.with_menu_p(|menu_p| {
+            self.classname.with_c_u16_str(|clsname_p| {
                 let wcex = WNDCLASSEX {
                     cbSize: std::mem::size_of::<WNDCLASSEX>() as UINT,
                     style: self.style as UINT,
@@ -41,8 +41,8 @@ impl WndClass {
 
                 let res = unsafe { RegisterClassExW(&wcex) };
                 res != 0
-            }
-        }
+            })
+        })
     }
 }
 
@@ -132,8 +132,8 @@ impl Window {
         }
 
         let wnd = unsafe {
-            do classname.with_c_u16_str |clsname_p| {
-                do params.window_name.with_c_u16_str |title_p| {
+            classname.with_c_u16_str(|clsname_p| {
+                params.window_name.with_c_u16_str(|title_p| {
                     let wnd = CreateWindowExW(
                         params.ex_style, clsname_p, title_p, params.style,
                         params.x as c_int, params.y as c_int,
@@ -142,8 +142,8 @@ impl Window {
                         ptr::mut_null()
                     );
                     wnd
-                }
-            }
+                })
+            })
         };
 
         if wnd != ptr::mut_null() {
@@ -236,11 +236,11 @@ pub extern "system" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM)
         },
         None => {}
     };
-    do local_data::get(key_win_map) |wmap| {
+    local_data::get(key_win_map, |wmap| {
         let wmap = wmap.unwrap();
         let wproc = wmap.find(&win).unwrap();
         wproc.wnd_proc(msg, w, l)
-    }
+    })
 }
 
 pub trait OnCreate {

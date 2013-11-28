@@ -131,7 +131,7 @@ impl Clone for Font {
 
 impl Font {
     pub fn new(attr: &FontAttr) -> Option<Font> {
-        let hfont = do attr.face.with_c_u16_str |face| {
+        let hfont = attr.face.with_c_u16_str(|face| {
             unsafe {
                 CreateFontW(
                     attr.height as c_int,
@@ -150,7 +150,7 @@ impl Font {
                     face
                 )
             }
-        };
+        });
         if hfont == ptr::mut_null() {
             None
         }

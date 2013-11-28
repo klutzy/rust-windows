@@ -32,7 +32,7 @@ impl CU16String {
     /// # Failure
     ///
     /// Fails if the CU16String is null.
-    pub fn with_ref<T>(&self, f: &fn(*u16) -> T) -> T {
+    pub fn with_ref<T>(&self, f: |*u16| -> T) -> T {
         if self.buf.is_null() { fail!("CU16String is null!"); }
         f(self.buf)
     }
@@ -42,7 +42,7 @@ impl CU16String {
     /// # Failure
     ///
     /// Fails if the CU16String is null.
-    pub fn with_mut_ref<T>(&mut self, f: &fn(*mut u16) -> T) -> T {
+    pub fn with_mut_ref<T>(&mut self, f: |*mut u16| -> T) -> T {
         if self.buf.is_null() { fail!("CU16String is null!"); }
         f(unsafe { cast::transmute_mut_unsafe(self.buf) })
     }
@@ -128,11 +128,11 @@ pub unsafe fn from_c_u16_multistring(buf: *u16, count: Option<uint>, f: |&CU16St
 
 /// A generic trait for converting a value to a `CU16String`, like `ToCStr`.
 pub trait ToCU16Str {
-    fn with_c_u16_str<T>(&self, f: &fn(*u16) -> T) -> T;
+    fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T;
 }
 
 impl<'self> ToCU16Str for &'self str {
-    fn with_c_u16_str<T>(&self, f: &fn(*u16) -> T) -> T {
+    fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T {
         let mut t = self.to_utf16();
         // Null terminate before passing on.
         t.push(0u16);
@@ -141,7 +141,7 @@ impl<'self> ToCU16Str for &'self str {
 }
 
 impl<S: Str> ToCU16Str for Option<S> {
-    fn with_c_u16_str<T>(&self, f: &fn(*u16) -> T) -> T {
+    fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T {
         match self {
             &None => f(ptr::null()),
             &Some(ref s) => {
