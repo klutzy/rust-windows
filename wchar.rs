@@ -129,6 +129,7 @@ pub unsafe fn from_c_u16_multistring(buf: *u16, count: Option<uint>, f: |&CU16St
 /// A generic trait for converting a value to a `CU16String`, like `ToCStr`.
 pub trait ToCU16Str {
     fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T;
+    fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T;
 }
 
 impl<'self> ToCU16Str for &'self str {
@@ -138,6 +139,12 @@ impl<'self> ToCU16Str for &'self str {
         t.push(0u16);
         t.as_imm_buf(|buf, _len| f(buf))
     }
+
+    fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T {
+        let mut t = self.to_utf16();
+        t.push(0u16);
+        t.as_mut_buf(|buf, _len| f(buf))
+    }
 }
 
 impl<S: Str> ToCU16Str for Option<S> {
@@ -146,6 +153,15 @@ impl<S: Str> ToCU16Str for Option<S> {
             &None => f(ptr::null()),
             &Some(ref s) => {
                 s.as_slice().with_c_u16_str(f)
+            },
+        }
+    }
+
+    fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T {
+        match self {
+            &None => f(ptr::mut_null()),
+            &Some(ref s) => {
+                s.as_slice().with_c_u16_str_mut(f)
             },
         }
     }
