@@ -3,8 +3,8 @@ use std::libc;
 use std::ptr;
 use std::str;
 
-// CU16String is a cursed version of `std::c_str::CString`
-// which treats null-terminated utf-16 strings.
+// CU16String is a cursed version of `std::c_str::CString` for
+// null-terminated utf-16 strings.
 
 /// The representation of a C UTF-16 string.
 pub struct CU16String {
@@ -162,12 +162,12 @@ mod test {
             0xac00, 0x20, 0xac00, 0x00,
         ];
 
-        do u16s.as_imm_buf |buf, _len| {
+        u16s.as_imm_buf(|buf, _len| {
             let cu = unsafe { CU16String::new(buf, false) };
             let v = cu.as_u16_vec();
             debug!("v: {:?}", v);
             assert_eq!(v, u16s);
-        }
+        })
     }
 
     #[test]
@@ -186,16 +186,16 @@ mod test {
             "가가가갂",
         ];
         let mut i = 0;
-        do test.as_imm_buf |buf, _len| {
+        test.as_imm_buf(|buf, _len| {
             unsafe {
-                do from_c_u16_multistring(buf, None) |cu| {
+                from_c_u16_multistring(buf, None, |cu| {
                     let b = cu.to_str();
                     assert_eq!(b.char_len(), i + 1);
                     assert_eq!(b, compare[i].to_owned());
                     i += 1;
-                }
+                })
             }
-        };
+        });
         assert_eq!(i, 4);
     }
 }
