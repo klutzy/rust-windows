@@ -57,7 +57,7 @@ macro_rules! wnd_proc(
             $(
                 wnd_proc_thunk!($msg)
             )+
-            win32::def_window_proc(self.wnd().wnd, msg, w, l)
+            windows::def_window_proc(self.wnd().wnd, msg, w, l)
         }
     }
 

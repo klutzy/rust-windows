@@ -1,16 +1,18 @@
 #[feature(globs, macro_rules)];
 
-extern mod win32;
+extern mod windows = "rust-windows";
 
 use std::ptr;
 use std::cell::RefCell;
 
-use win32::ll::*;
-use win32::instance::*;
-use win32::resource::*;
-use win32::window::*;
-use win32::gdi::WindowPaint;
-use win32::font::Font;
+use windows::main_window_loop;
+use windows::ll::*;
+use windows::instance::*;
+use windows::resource::*;
+use windows::window::*;
+use windows::gdi::WindowPaint;
+use windows::font::Font;
+use windows::font;
 
 #[path = "../wnd_proc_macro.rs"]
 mod macro;
@@ -18,8 +20,8 @@ mod macro;
 // TODO duplicate of hello.rc
 static IDI_ICON: int = 0x101;
 static MENU_MAIN: int = 0x201;
-static MENU_NEW: int = 0x202;
-static MENU_EXIT: int = 0x203;
+//static MENU_NEW: int = 0x202;
+//static MENU_EXIT: int = 0x203;
 
 struct MainFrame {
     win: Window,
@@ -51,7 +53,7 @@ impl OnCreate for MainFrame {
             None => false,
             Some(e) => {
                 let font_attr = Default::default();
-                let font = win32::font::Font::new(&font_attr);
+                let font = font::Font::new(&font_attr);
                 debug!("font: {:?}", font);
                 match font {
                     None => false,
@@ -154,6 +156,6 @@ fn main() {
     main.show(1);
     main.update();
 
-    let exit_code = win32::main_window_loop();
+    let exit_code = main_window_loop();
     std::os::set_exit_status(exit_code as int);
 }

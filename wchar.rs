@@ -132,7 +132,7 @@ pub trait ToCU16Str {
     fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T;
 }
 
-impl<'self> ToCU16Str for &'self str {
+impl<'a> ToCU16Str for &'a str {
     fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T {
         let mut t = self.to_utf16();
         // Null terminate before passing on.

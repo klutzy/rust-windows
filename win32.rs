@@ -1,6 +1,6 @@
 #[feature(globs)];
 #[crate_type = "lib"];
-#[link(name = "win32")];
+#[pkgid = "https://github.com/klutzy/rust-windows"];
 
 #[link_args = "-lgdi32"];
 
