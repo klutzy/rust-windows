@@ -137,13 +137,13 @@ impl<'a> ToCU16Str for &'a str {
         let mut t = self.to_utf16();
         // Null terminate before passing on.
         t.push(0u16);
-        t.as_imm_buf(|buf, _len| f(buf))
+        f(t.as_ptr())
     }
 
     fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T {
         let mut t = self.to_utf16();
         t.push(0u16);
-        t.as_mut_buf(|buf, _len| f(buf))
+        f(t.as_mut_ptr())
     }
 }
 

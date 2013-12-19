@@ -1,5 +1,5 @@
-RUSTC=rustc.exe
-RUST_OPTS=
+RUSTC?=rustc.exe
+RUST_OPTS?=
 SRC=$(wildcard *.rs) $(wildcard ll/*.rs)
 
 .PHONY: all
@@ -22,5 +22,5 @@ examples: libwin32.dummy
 
 .PHONY: clean
 clean:
-	rm -rf libwin32.dummy win32*.dll test.exe
+	rm -rf libwin32.dummy rust-windows-*.dll test.exe
 	$(MAKE) -C examples clean
