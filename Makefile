@@ -3,24 +3,24 @@ RUST_OPTS?=
 SRC=$(wildcard *.rs) $(wildcard ll/*.rs)
 
 .PHONY: all
-all: libwin32.dummy
+all: libwindows.dummy
 
-libwin32.dummy: $(SRC)
-	$(RUSTC) --lib -o $@ win32.rs $(RUST_OPTS)
-	touch libwin32.dummy
+libwindows.dummy: $(SRC)
+	$(RUSTC) --lib lib.rs $(RUST_OPTS)
+	touch $@
 
 .PHONY: check
 check: $(SRC)
-	$(RUSTC) --test -o $@ win32.rs
+	$(RUSTC) --test -o $@ lib.rs
 	./$@
 
 
 .PHONY: examples
-examples: libwin32.dummy
+examples: libwindows.dummy
 	$(MAKE) -C examples RUST_OPTS="$(RUST_OPTS)"
 
 
 .PHONY: clean
 clean:
-	rm -rf libwin32.dummy rust-windows-*.dll test.exe
+	rm -rf libwindows.dummy rust-windows-*.dll *.exe
 	$(MAKE) -C examples clean
