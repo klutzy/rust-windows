@@ -10,7 +10,7 @@ RC=$(patsubst %.rc, %.rc.o, $(RES))
 .PHONY: all
 all: $(EXE)
 
-%.exe: %.rs ../libwin32.dummy %.rc.o
+%.exe: %.rs ../libwindows.dummy %.rc.o
 	$(RUSTC) -L .. -o $@ $< --link-args $*.rc.o $(RUST_OPTS)
 
 %.rc.o: %.rc
