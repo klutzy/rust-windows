@@ -1,4 +1,5 @@
 #[feature(globs)];
+#[crate_type = "rlib"];
 #[crate_type = "lib"];
 #[crate_id = "https://github.com/klutzy/rust-windows"];
 
