@@ -179,6 +179,10 @@ extern "system" {
     pub fn SetFocus(hwnd: HWND) -> HWND;
 
     pub fn SendMessageW(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT;
+}
 
+// gdi32
+#[link(name = "gdi32")]
+extern "system" {
     pub fn SelectObject(hdc: HDC, hgdiobj: HGDIOBJ) -> HGDIOBJ;
 }
