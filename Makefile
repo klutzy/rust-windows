@@ -22,5 +22,5 @@ examples: libwindows.dummy
 
 .PHONY: clean
 clean:
-	rm -rf libwindows.dummy rust-windows-*.dll *.exe
+	rm -rf libwindows.dummy librust-windows-*.rlib rust-windows-*.dll *.exe
 	$(MAKE) -C examples clean
