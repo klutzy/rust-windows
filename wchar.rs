@@ -128,26 +128,35 @@ pub unsafe fn from_c_u16_multistring(buf: *u16, count: Option<uint>, f: |&CU16St
 
 /// A generic trait for converting a value to a `CU16String`, like `ToCStr`.
 pub trait ToCU16Str {
-    fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T;
-    fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T;
-}
+    fn to_c_u16(&self) -> ~[u16];
 
-impl<'a> ToCU16Str for &'a str {
     fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T {
-        let mut t = self.to_utf16();
-        // Null terminate before passing on.
-        t.push(0u16);
+        let t = self.to_c_u16();
         f(t.as_ptr())
     }
 
     fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T {
-        let mut t = self.to_utf16();
-        t.push(0u16);
+        let mut t = self.to_c_u16();
         f(t.as_mut_ptr())
     }
 }
 
+impl<'a> ToCU16Str for &'a str {
+    fn to_c_u16(&self) -> ~[u16] {
+        let mut t = self.to_utf16();
+        t.push(0u16);
+        t
+    }
+}
+
 impl<S: Str> ToCU16Str for Option<S> {
+    fn to_c_u16(&self) -> ~[u16] {
+        match self {
+            &None => ~[],
+            &Some(ref s) => s.as_slice().to_c_u16(),
+        }
+    }
+
     fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T {
         match self {
             &None => f(ptr::null()),
@@ -178,12 +187,9 @@ mod test {
             0xac00, 0x20, 0xac00, 0x00,
         ];
 
-        u16s.as_imm_buf(|buf, _len| {
-            let cu = unsafe { CU16String::new(buf, false) };
-            let v = cu.as_u16_vec();
-            debug!("v: {:?}", v);
-            assert_eq!(v, u16s);
-        })
+        let cu = unsafe { CU16String::new(u16s.as_ptr(), false) };
+        let v = cu.as_u16_vec();
+        assert_eq!(v, u16s);
     }
 
     #[test]
@@ -202,16 +208,15 @@ mod test {
             "가가가갂",
         ];
         let mut i = 0;
-        test.as_imm_buf(|buf, _len| {
-            unsafe {
-                from_c_u16_multistring(buf, None, |cu| {
-                    let b = cu.to_str();
-                    assert_eq!(b.char_len(), i + 1);
-                    assert_eq!(b, compare[i].to_owned());
-                    i += 1;
-                })
-            }
-        });
+        let buf = test.as_ptr();
+        unsafe {
+            from_c_u16_multistring(buf, None, |cu| {
+                let b = cu.to_str();
+                assert_eq!(b.char_len(), i + 1);
+                assert_eq!(b, compare[i].to_owned());
+                i += 1;
+            });
+        }
         assert_eq!(i, 4);
     }
 }
