@@ -1,3 +1,5 @@
+#[allow(non_camel_case_types)];
+
 use std::ptr;
 use std;
 
@@ -64,7 +66,10 @@ pub enum MenuResource {
 impl MenuResource {
     pub fn with_menu_p<T>(&self, f: |*u16| -> T) -> T {
         match *self {
-            MenuName(ref s) => s.as_slice().with_c_u16_str(f),
+            MenuName(ref s) => {
+                let u = s.as_slice().to_c_u16();
+                f(u.as_ptr())
+            }
             MenuId(id) => unsafe { f(std::cast::transmute(id)) },
         }
     }

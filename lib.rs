@@ -1,13 +1,16 @@
 #[feature(globs)];
-#[crate_type = "rlib"];
 #[crate_type = "lib"];
 #[crate_id = "https://github.com/klutzy/rust-windows"];
+
+extern crate collections;
 
 use std::ptr;
 
 use ll::*;
 
 pub mod ll {
+    #[allow(non_camel_case_types)];
+
     pub use ll::platform::*;
     pub use ll::windef::*;
     pub use ll::all::*;
@@ -39,7 +42,7 @@ pub fn env() -> ~[(~str,~str)] {
             }
 
             let ch = GetEnvironmentStringsW();
-            if (ch as uint == 0) {
+            if ch.is_null() {
                 fail!("os::env() failure getting env string from OS: {}",
                        std::os::last_os_error());
             }

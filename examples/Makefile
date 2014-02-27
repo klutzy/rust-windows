@@ -11,7 +11,7 @@ RC=$(patsubst %.rc, %.rc.o, $(RES))
 all: $(EXE)
 
 %.exe: %.rs ../libwindows.dummy %.rc.o
-	$(RUSTC) -L .. -o $@ $< --link-args $*.rc.o $(RUST_OPTS)
+	$(RUSTC) -L .. -o $@ $< -C link-args=$*.rc.o $(RUST_OPTS)
 
 %.rc.o: %.rc
 	windres $< $@

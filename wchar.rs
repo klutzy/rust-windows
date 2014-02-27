@@ -1,6 +1,7 @@
 use std::cast;
 use std::ptr;
 use std::str;
+use std::fmt;
 
 // Helper struct for *u16 manipulation.
 pub struct CU16String {
@@ -17,6 +18,7 @@ impl CU16String {
     }
 
     /// Converts the CU16String into a `&[u8]` without copying.
+    /// NULL is not included.
     ///
     /// # Failure
     ///
@@ -25,18 +27,20 @@ impl CU16String {
     pub fn as_u16_vec<'a>(&'a self) -> &'a [u16] {
         if self.buf.is_null() { fail!("CU16String is null!"); }
         unsafe {
-            cast::transmute((self.buf, self.len))
+            cast::transmute((self.buf, self.len - 1))
         }
     }
 }
 
-impl ToStr for CU16String {
+impl fmt::Show for CU16String {
     #[inline]
-    fn to_str(&self) -> ~str {
-        if self.buf.is_null() {
-            return ~"";
-        }
-        str::from_utf16(self.as_u16_vec())
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = if self.buf.is_null() {
+            ~""
+        } else {
+            str::from_utf16_lossy(self.as_u16_vec())
+        };
+        s.fmt(f)
     }
 }
 
@@ -62,16 +66,6 @@ pub unsafe fn from_c_u16_multistring(buf: *u16, count: Option<uint>, f: |&[u16]|
 /// A generic trait for converting a value to a `CU16String`, like `ToCStr`.
 pub trait ToCU16Str {
     fn to_c_u16(&self) -> ~[u16];
-
-    fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T {
-        let t = self.to_c_u16();
-        f(t.as_ptr())
-    }
-
-    fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T {
-        let mut t = self.to_c_u16();
-        f(t.as_mut_ptr())
-    }
 }
 
 impl<'a> ToCU16Str for &'a str {
@@ -87,24 +81,6 @@ impl<S: Str> ToCU16Str for Option<S> {
         match self {
             &None => ~[],
             &Some(ref s) => s.as_slice().to_c_u16(),
-        }
-    }
-
-    fn with_c_u16_str<T>(&self, f: |*u16| -> T) -> T {
-        match self {
-            &None => f(ptr::null()),
-            &Some(ref s) => {
-                s.as_slice().with_c_u16_str(f)
-            },
-        }
-    }
-
-    fn with_c_u16_str_mut<T>(&mut self, f: |*mut u16| -> T) -> T {
-        match self {
-            &None => f(ptr::mut_null()),
-            &Some(ref s) => {
-                s.as_slice().with_c_u16_str_mut(f)
-            },
         }
     }
 }
@@ -123,7 +99,7 @@ mod test {
 
         let cu = unsafe { CU16String::new(u16s.as_ptr()) };
         let v = cu.as_u16_vec();
-        assert_eq!(v, u16s);
+        assert_eq!(v, u16s.slice_to(u16s.len() - 1));
     }
 
     #[test]
@@ -145,7 +121,7 @@ mod test {
         let buf = test.as_ptr();
         unsafe {
             from_c_u16_multistring(buf, None, |p| {
-                let b = from_utf16(p);
+                let b = from_utf16(p).expect("invalid utf-16 sequence");
                 assert_eq!(b.char_len(), i + 1);
                 assert_eq!(b, compare[i].to_owned());
                 i += 1;

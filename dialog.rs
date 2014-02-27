@@ -1,5 +1,5 @@
 use ll::*;
-use wchar::*;
+use wchar::ToCU16Str;
 use window::*;
 
 pub trait DialogUtil {
@@ -8,13 +8,10 @@ pub trait DialogUtil {
 
 impl DialogUtil for Window {
     fn message_box(&self, msg: &str, title: &str) {
-        msg.with_c_u16_str(|msg_p| {
-            title.with_c_u16_str(|title_p| {
-                unsafe {
-                    MessageBoxW(self.wnd, msg_p, title_p, 0u32);
-                }
-            })
-        })
+        let msg_u = msg.to_c_u16();
+        let title_u = title.to_c_u16();
+        unsafe {
+            MessageBoxW(self.wnd, msg_u.as_ptr(), title_u.as_ptr(), 0u32);
+        }
     }
 }
-

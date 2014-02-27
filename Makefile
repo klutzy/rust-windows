@@ -6,7 +6,7 @@ SRC=$(wildcard *.rs) $(wildcard ll/*.rs)
 all: libwindows.dummy
 
 libwindows.dummy: $(SRC)
-	$(RUSTC) --lib lib.rs $(RUST_OPTS)
+	$(RUSTC) lib.rs $(RUST_OPTS)
 	touch $@
 
 .PHONY: check

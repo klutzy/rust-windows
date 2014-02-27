@@ -1,7 +1,8 @@
 use std::local_data;
-use std::hashmap::HashMap;
 use std::ptr;
 use std;
+
+use collections::HashMap;
 
 use ll::*;
 use wchar::*;
@@ -23,25 +24,24 @@ pub struct WndClass {
 impl WndClass {
     pub fn register(&self, instance: Instance) -> bool {
         self.menu.with_menu_p(|menu_p| {
-            self.classname.with_c_u16_str(|clsname_p| {
-                let wcex = WNDCLASSEX {
-                    cbSize: std::mem::size_of::<WNDCLASSEX>() as UINT,
-                    style: self.style as UINT,
-                    lpfnWndProc: main_wnd_proc as *c_void,
-                    cbClsExtra: self.cls_extra as INT,
-                    cbWndExtra: self.wnd_extra as INT,
-                    hInstance: instance.instance,
-                    hIcon: self.icon.to_handle(),
-                    hCursor: self.cursor.to_handle(),
-                    hbrBackground: self.background,
-                    lpszMenuName: menu_p,
-                    lpszClassName: clsname_p,
-                    hIconSm: self.icon_small.to_handle(),
-                };
+            let clsname_u = self.classname.to_c_u16();
+            let wcex = WNDCLASSEX {
+                cbSize: std::mem::size_of::<WNDCLASSEX>() as UINT,
+                style: self.style as UINT,
+                lpfnWndProc: main_wnd_proc as *c_void,
+                cbClsExtra: self.cls_extra as INT,
+                cbWndExtra: self.wnd_extra as INT,
+                hInstance: instance.instance,
+                hIcon: self.icon.to_handle(),
+                hCursor: self.cursor.to_handle(),
+                hbrBackground: self.background,
+                lpszMenuName: menu_p,
+                lpszClassName: clsname_u.as_ptr(),
+                hIconSm: self.icon_small.to_handle(),
+            };
 
-                let res = unsafe { RegisterClassExW(&wcex) };
-                res != 0
-            })
+            let res = unsafe { RegisterClassExW(&wcex) };
+            res != 0
         })
     }
 }
@@ -101,7 +101,7 @@ pub struct WindowParams {
     ex_style: u32,
 }
 
-#[deriving(Eq, IterBytes)]
+#[deriving(Eq, Hash)]
 pub struct Window {
     wnd: HWND,
 }
@@ -132,18 +132,16 @@ impl Window {
         }
 
         let wnd = unsafe {
-            classname.with_c_u16_str(|clsname_p| {
-                params.window_name.with_c_u16_str(|title_p| {
-                    let wnd = CreateWindowExW(
-                        params.ex_style, clsname_p, title_p, params.style,
-                        params.x as c_int, params.y as c_int,
-                        params.width as c_int, params.height as c_int,
-                        params.parent.wnd, params.menu, instance.instance,
-                        ptr::mut_null()
-                    );
-                    wnd
-                })
-            })
+            let clsname_u = classname.to_c_u16();
+            let title_u = params.window_name.to_c_u16();
+            let wnd = CreateWindowExW(
+                params.ex_style, clsname_u.as_ptr(), title_u.as_ptr(), params.style,
+                params.x as c_int, params.y as c_int,
+                params.width as c_int, params.height as c_int,
+                params.parent.wnd, params.menu, instance.instance,
+                ptr::mut_null()
+            );
+            wnd
         };
 
         if wnd != ptr::mut_null() {

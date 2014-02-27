@@ -1,4 +1,7 @@
+#[allow(non_camel_case_types)];
+
 use std::ptr;
+use std::default::Default;
 
 use ll::*;
 use wchar::*;
@@ -131,26 +134,25 @@ impl Clone for Font {
 
 impl Font {
     pub fn new(attr: &FontAttr) -> Option<Font> {
-        let hfont = attr.face.with_c_u16_str(|face| {
-            unsafe {
-                CreateFontW(
-                    attr.height as c_int,
-                    attr.width as c_int,
-                    attr.escapement as c_int,
-                    attr.orientation as c_int,
-                    attr.weight as c_int,
-                    attr.italic as DWORD,
-                    attr.underline as DWORD,
-                    attr.strike_out as DWORD,
-                    attr.char_set as DWORD,
-                    attr.output_precision as DWORD,
-                    attr.clip_precision as DWORD,
-                    attr.quality as DWORD,
-                    (attr.pitch as DWORD) | (attr.family as DWORD),
-                    face
-                )
-            }
-        });
+        let face = attr.face.to_c_u16();
+        let hfont = unsafe {
+            CreateFontW(
+                attr.height as c_int,
+                attr.width as c_int,
+                attr.escapement as c_int,
+                attr.orientation as c_int,
+                attr.weight as c_int,
+                attr.italic as DWORD,
+                attr.underline as DWORD,
+                attr.strike_out as DWORD,
+                attr.char_set as DWORD,
+                attr.output_precision as DWORD,
+                attr.clip_precision as DWORD,
+                attr.quality as DWORD,
+                (attr.pitch as DWORD) | (attr.family as DWORD),
+                face.as_ptr()
+            )
+        };
         if hfont == ptr::mut_null() {
             None
         }

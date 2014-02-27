@@ -1,9 +1,10 @@
 #[feature(globs, macro_rules)];
 
-extern mod windows = "rust-windows";
+extern crate windows = "rust-windows";
 
 use std::ptr;
 use std::cell::RefCell;
+use std::default::Default;
 
 use windows::main_window_loop;
 use windows::ll::*;
