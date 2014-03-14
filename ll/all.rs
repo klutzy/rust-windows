@@ -120,6 +120,8 @@ extern "system" {
 
     pub fn ShowWindow(hwnd: HWND, nCmdShow: c_int) -> BOOL;
 
+    pub fn ShowWindowAsync(hwnd: HWND, nCmdShow: c_int) -> BOOL;
+
     pub fn UpdateWindow(hwnd: HWND) -> BOOL;
 
     pub fn BeginPaint(hwnd: HWND, lpPaint: *mut PAINTSTRUCT) -> HDC;

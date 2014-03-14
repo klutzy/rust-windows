@@ -155,6 +155,10 @@ impl Window {
         unsafe { ShowWindow(self.wnd, cmd_show as c_int) == 0 }
     }
 
+    pub fn show_async(&self, cmd_show: int) -> bool {
+        unsafe { ShowWindowAsync(self.wnd, cmd_show as c_int) == 0 }
+    }
+
     pub fn update(&self) -> bool {
         unsafe { UpdateWindow(self.wnd) == 0 }
     }
