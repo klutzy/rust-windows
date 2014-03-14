@@ -17,7 +17,7 @@ check: $(SRC)
 
 .PHONY: examples
 examples: libwindows.dummy
-	$(MAKE) -C examples RUST_OPTS="$(RUST_OPTS)"
+	$(MAKE) -C examples RUST_OPTS="$(RUST_OPTS)" RUSTC="$(RUSTC)"
 
 
 .PHONY: clean

@@ -1,4 +1,4 @@
-RUSTC=rustc.exe
+RUSTC?=rustc.exe
 RUST_OPTS=
 SRC=hello.rs
 RES=hello.rc
