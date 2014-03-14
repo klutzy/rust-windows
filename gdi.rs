@@ -4,25 +4,28 @@ use ll::*;
 use font::Font;
 use window::WindowImpl;
 
-// TODO: allocated DC (CreateDC/ReleaseDC)
 pub struct Dc {
-    dc: HDC,
+    raw: HDC,
 }
 
 impl Dc {
+    pub fn raw(&self) -> HDC {
+        self.raw
+    }
+
     pub fn text_out(&self, x: int, y: int, s: &str) -> bool {
         let mut s16 = s.to_utf16();
         let len = s16.len();
 
         s16.push(0u16);
         let ret = unsafe {
-            TextOutW(self.dc, x as c_int, y as c_int, s16.as_mut_ptr(), len as i32)
+            TextOutW(self.raw, x as c_int, y as c_int, s16.as_mut_ptr(), len as i32)
         };
         ret != 0
     }
 
     pub fn select_font(&self, font: &Font) -> Option<Font> {
-        let res = unsafe { SelectObject(self.dc, font.font as HGDIOBJ) };
+        let res = unsafe { SelectObject(self.raw, font.font as HGDIOBJ) };
         if res.is_null() {
             None
         } else {
@@ -31,15 +34,15 @@ impl Dc {
     }
 }
 
-// TODO better name
-pub trait WindowPaint {
-    fn with_paint_dc<T>(&self, f: |Dc| -> T) -> T;
+pub struct PaintDc {
+    dc: Dc,
+    wnd: HWND,
+    ps: PAINTSTRUCT,
 }
 
-impl<T: WindowImpl> WindowPaint for T {
-    fn with_paint_dc<T>(&self, f: |Dc| -> T) -> T {
-        let rgb_res: [BYTE, ..32] = [0 as BYTE, ..32];
-        let ps = PAINTSTRUCT {
+impl PaintDc {
+    pub fn new<W: WindowImpl>(w: &W) -> Option<PaintDc> {
+        let mut ps = PAINTSTRUCT {
             hdc: ptr::mut_null(),
             fErase: 0 as BOOL,
             rcPaint: RECT {
@@ -48,15 +51,26 @@ impl<T: WindowImpl> WindowPaint for T {
             },
             fRestore: 0 as BOOL,
             fIncUpdate: 0 as BOOL,
-            rgbReserved: &rgb_res,
+            rgbReserved: [0 as BYTE, ..32],
         };
 
-        let dc = unsafe { BeginPaint(self.wnd().wnd, &ps) };
-        let dc = Dc { dc: dc };
+        let wnd = w.wnd().wnd;
+        let dc = unsafe { BeginPaint(wnd, &mut ps) };
+        if dc.is_null() {
+            return None;
+        }
 
-        let ret = f(dc);
+        let pdc = PaintDc {
+            dc: Dc { raw: dc },
+            wnd: wnd,
+            ps: ps,
+        };
+        Some(pdc)
+    }
+}
 
-        unsafe { EndPaint(self.wnd().wnd, &ps) };
-        ret
+impl Drop for PaintDc {
+    fn drop(&mut self) {
+        unsafe { EndPaint(self.wnd, &self.ps) };
     }
 }

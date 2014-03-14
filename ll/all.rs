@@ -88,7 +88,7 @@ pub struct PAINTSTRUCT {
     rcPaint: RECT,
     fRestore: BOOL,
     fIncUpdate: BOOL,
-    rgbReserved: *[BYTE, ..32],
+    rgbReserved: [BYTE, ..32],
 }
 
 // kernel32
@@ -122,7 +122,7 @@ extern "system" {
 
     pub fn UpdateWindow(hwnd: HWND) -> BOOL;
 
-    pub fn BeginPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> HDC;
+    pub fn BeginPaint(hwnd: HWND, lpPaint: *mut PAINTSTRUCT) -> HDC;
 
     pub fn EndPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> BOOL;
 

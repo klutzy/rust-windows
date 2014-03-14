@@ -11,7 +11,7 @@ use windows::ll::*;
 use windows::instance::*;
 use windows::resource::*;
 use windows::window::*;
-use windows::gdi::WindowPaint;
+use windows::gdi::PaintDc;
 use windows::font::Font;
 use windows::font;
 
@@ -88,10 +88,9 @@ impl OnDestroy for MainFrame {}
 impl OnPaint for MainFrame {
     fn on_paint(&self) {
         self.font.with(|font| {
-            self.with_paint_dc(|dc| {
-                dc.select_font(&font.unwrap());
-                dc.text_out(0, 0, self.title);
-            });
+            let pdc = PaintDc::new(self).expect("Paint DC");
+            pdc.dc.select_font(&font.unwrap());
+            pdc.dc.text_out(0, 0, self.title);
         })
     }
 }
