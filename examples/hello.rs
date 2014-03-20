@@ -1,4 +1,6 @@
-#[feature(globs, macro_rules)];
+#[feature(globs, macro_rules, phase)];
+
+#[phase(syntax, link)] extern crate log;
 
 extern crate windows = "rust-windows";
 

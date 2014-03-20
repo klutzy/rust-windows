@@ -1,10 +1,13 @@
-#[feature(globs)];
+#[feature(globs, phase)];
 #[crate_type = "lib"];
-#[crate_id = "https://github.com/klutzy/rust-windows"];
+#[crate_id = "rust-windows"];
+
+#[phase(syntax, link)] extern crate log;
 
 extern crate collections;
 
 use std::ptr;
+use std::vec_ng::Vec;
 
 use ll::*;
 
@@ -33,9 +36,9 @@ pub mod dialog;
 /// Returns a vector of (variable, value) pairs for all the environment
 /// variables of the current process.
 /// This is unicode-version of `std::os::env()`.
-pub fn env() -> ~[(~str,~str)] {
+pub fn env() -> Vec<(~str, ~str)> {
     unsafe {
-        unsafe fn get_env_pairs() -> ~[~str] {
+        unsafe fn get_env_pairs() -> Vec<~str> {
             extern "system" {
                 fn GetEnvironmentStringsW() -> *u16;
                 fn FreeEnvironmentStringsW(ch: *u16) -> std::libc::BOOL;
@@ -46,7 +49,7 @@ pub fn env() -> ~[(~str,~str)] {
                 fail!("os::env() failure getting env string from OS: {}",
                        std::os::last_os_error());
             }
-            let mut result = ~[];
+            let mut result = Vec::new();
             wchar::from_c_u16_multistring(ch as *u16, None, |cstr| {
                 result.push(cstr.to_str());
             });
@@ -54,13 +57,13 @@ pub fn env() -> ~[(~str,~str)] {
             result
         }
 
-        fn env_convert(input: ~[~str]) -> ~[(~str, ~str)] {
-            let mut pairs = ~[];
+        fn env_convert(input: Vec<~str>) -> Vec<(~str, ~str)> {
+            let mut pairs = Vec::new();
             for p in input.iter() {
-                let vs: ~[&str] = p.splitn('=', 1).collect();
+                let vs: Vec<&str> = p.splitn('=', 1).collect();
                 debug!("splitting: vs: {:?} len: {}", vs, vs.len());
                 assert_eq!(vs.len(), 2);
-                pairs.push((vs[0].to_owned(), vs[1].to_owned()));
+                pairs.push((vs.get(0).to_owned(), vs.get(1).to_owned()));
             }
             pairs
         }

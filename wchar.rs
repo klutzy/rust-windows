@@ -2,6 +2,7 @@ use std::cast;
 use std::ptr;
 use std::str;
 use std::fmt;
+use std::vec_ng::Vec;
 
 // Helper struct for *u16 manipulation.
 pub struct CU16String {
@@ -65,21 +66,22 @@ pub unsafe fn from_c_u16_multistring(buf: *u16, count: Option<uint>, f: |&[u16]|
 
 /// A generic trait for converting a value to a `CU16String`, like `ToCStr`.
 pub trait ToCU16Str {
-    fn to_c_u16(&self) -> ~[u16];
+    fn to_c_u16(&self) -> Vec<u16>;
 }
 
 impl<'a> ToCU16Str for &'a str {
-    fn to_c_u16(&self) -> ~[u16] {
-        let mut t = self.to_utf16();
+    fn to_c_u16(&self) -> Vec<u16> {
+        #[allow(deprecated_owned_vector)];
+        let mut t = Vec::from_slice(self.to_utf16());
         t.push(0u16);
         t
     }
 }
 
 impl<S: Str> ToCU16Str for Option<S> {
-    fn to_c_u16(&self) -> ~[u16] {
+    fn to_c_u16(&self) -> Vec<u16> {
         match self {
-            &None => ~[],
+            &None => Vec::new(),
             &Some(ref s) => s.as_slice().to_c_u16(),
         }
     }
