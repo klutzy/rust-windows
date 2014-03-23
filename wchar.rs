@@ -2,7 +2,7 @@ use std::cast;
 use std::ptr;
 use std::str;
 use std::fmt;
-use std::vec_ng::Vec;
+use std::vec::Vec;
 
 // Helper struct for *u16 manipulation.
 pub struct CU16String {

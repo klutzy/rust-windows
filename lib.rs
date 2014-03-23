@@ -7,7 +7,7 @@
 extern crate collections;
 
 use std::ptr;
-use std::vec_ng::Vec;
+use std::vec::Vec;
 
 use ll::*;
 
