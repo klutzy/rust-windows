@@ -65,8 +65,8 @@ impl OnCreate for MainFrame {
                         unsafe {
                             e.send_message(WM_SETFONT, std::cast::transmute(f.font), 0);
                         }
-                        self.edit.with_mut(|r| {*r = Some(e);});
-                        self.font.with_mut(|r| {*r = Some(f);});
+                        *self.edit.borrow_mut() = Some(e);
+                        *self.font.borrow_mut() = Some(f);
                         true
                     }
                 }
@@ -77,11 +77,10 @@ impl OnCreate for MainFrame {
 
 impl OnSize for MainFrame {
     fn on_size(&self, width: int, height: int) {
-        self.edit.with(|edit| {
-            // SWP_NOOWNERZORDER | SWP_NOZORDER
-            let h = self.text_height;
-            edit.unwrap().set_window_pos(0, h, width, height - h, 0x200 | 0x4);
-        })
+        // SWP_NOOWNERZORDER | SWP_NOZORDER
+        let h = self.text_height;
+        self.edit.borrow().expect("edit is empty")
+            .set_window_pos(0, h, width, height - h, 0x200 | 0x4);
     }
 }
 
@@ -89,19 +88,16 @@ impl OnDestroy for MainFrame {}
 
 impl OnPaint for MainFrame {
     fn on_paint(&self) {
-        self.font.with(|font| {
-            let pdc = PaintDc::new(self).expect("Paint DC");
-            pdc.dc.select_font(&font.unwrap());
-            pdc.dc.text_out(0, 0, self.title);
-        })
+        let font = self.font.borrow();
+        let pdc = PaintDc::new(self).expect("Paint DC");
+        pdc.dc.select_font(&font.expect("font is empty"));
+        pdc.dc.text_out(0, 0, self.title);
     }
 }
 
 impl OnFocus for MainFrame {
     fn on_focus(&self, _w: Window) {
-        self.edit.with(|edit| {
-            edit.unwrap().set_focus();
-        })
+        self.edit.borrow().expect("edit is empty").set_focus();
     }
 }
 

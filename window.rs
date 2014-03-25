@@ -101,7 +101,7 @@ pub struct WindowParams {
     ex_style: u32,
 }
 
-#[deriving(Eq, Hash)]
+#[deriving(Eq, TotalEq, Hash)]
 pub struct Window {
     wnd: HWND,
 }
