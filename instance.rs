@@ -1,15 +1,15 @@
 use std::ptr;
 
-use ll::*;
+use ll::windef::HINSTANCE;
 
 pub struct Instance {
-    instance: HINSTANCE
+    pub instance: HINSTANCE
 }
 
 impl Instance {
     pub fn main_instance() -> Instance {
         Instance {
-            instance: unsafe { GetModuleHandleW(ptr::null()) as HINSTANCE },
+            instance: unsafe { super::ll::all::GetModuleHandleW(ptr::null()) as HINSTANCE },
         }
     }
 }

@@ -11,7 +11,7 @@ impl DialogUtil for Window {
         let msg_u = msg.to_c_u16();
         let title_u = title.to_c_u16();
         unsafe {
-            ll::MessageBoxW(self.wnd, msg_u.as_ptr(), title_u.as_ptr(), 0u32);
+            ll::all::MessageBoxW(self.wnd, msg_u.as_ptr(), title_u.as_ptr(), 0u32);
         }
     }
 }

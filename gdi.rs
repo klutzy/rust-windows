@@ -1,12 +1,15 @@
 use std::ptr;
 
-use ll::*;
+use libc::c_int;
+use libc::{LONG, BOOL, BYTE, HANDLE, DWORD};
+use ll::all::PAINTSTRUCT;
+use ll::windef::{HDC, HWND, RECT, HBITMAP, HGDIOBJ};
 use ll::gdi;
 use font::Font;
 use window::WindowImpl;
 
 pub struct Dc {
-    raw: HDC,
+    pub raw: HDC,
 }
 
 impl Dc {
@@ -15,13 +18,13 @@ impl Dc {
     }
 
     pub fn text_out(&self, x: int, y: int, s: &str) -> bool {
-        #[allow(deprecated_owned_vector)];
+        #![allow(deprecated_owned_vector)]
         let mut s16 = s.to_utf16();
         let len = s16.len();
 
         s16.push(0u16);
         let ret = unsafe {
-            TextOutW(self.raw, x as c_int, y as c_int, s16.as_mut_ptr(), len as i32)
+            gdi::TextOutW(self.raw, x as c_int, y as c_int, s16.as_mut_ptr(), len as i32)
         };
         ret != 0
     }
@@ -60,9 +63,9 @@ impl Dc {
 }
 
 pub struct PaintDc {
-    dc: Dc,
-    wnd: HWND,
-    ps: PAINTSTRUCT,
+    pub dc: Dc,
+    pub wnd: HWND,
+    pub ps: PAINTSTRUCT,
 }
 
 impl PaintDc {
@@ -80,7 +83,7 @@ impl PaintDc {
         };
 
         let wnd = w.wnd().wnd;
-        let dc = unsafe { BeginPaint(wnd, &mut ps) };
+        let dc = unsafe { super::ll::all::BeginPaint(wnd, &mut ps) };
         if dc.is_null() {
             return None;
         }
@@ -96,12 +99,12 @@ impl PaintDc {
 
 impl Drop for PaintDc {
     fn drop(&mut self) {
-        unsafe { EndPaint(self.wnd, &self.ps) };
+        unsafe { super::ll::all::EndPaint(self.wnd, &self.ps) };
     }
 }
 
 pub struct MemoryDc {
-    dc: Dc,
+    pub dc: Dc,
 }
 
 impl MemoryDc {

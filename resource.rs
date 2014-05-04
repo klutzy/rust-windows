@@ -1,9 +1,12 @@
-#[allow(non_camel_case_types)];
+#![allow(non_camel_case_types)]
 
 use std::ptr;
 use std;
 
-use ll::*;
+use libc::c_int;
+use libc::HANDLE;
+use ll::windef::{UINT};
+
 use wchar::ToCU16Str;
 use instance::Instance;
 
@@ -27,13 +30,13 @@ pub enum ImageType {
 }
 
 pub struct Image {
-    image: HANDLE,
+    pub image: HANDLE,
 }
 
 impl Image {
     pub fn load_resource(instance: Instance, id: int, img_type: ImageType, width: int, height: int) -> Option<Image> {
         let img = unsafe {
-            LoadImageW(
+            super::ll::all::LoadImageW(
                 instance.instance, std::cast::transmute(id), img_type as UINT,
                 width as c_int, height as c_int, 0x8000
             )

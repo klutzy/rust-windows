@@ -6,9 +6,9 @@ use std::vec::Vec;
 
 // Helper struct for *u16 manipulation.
 pub struct CU16String {
-    priv buf: *u16,
+    buf: *u16,
     /// length of buffer, including null
-    priv len: uint,
+    len: uint,
 }
 
 impl CU16String {
@@ -18,7 +18,7 @@ impl CU16String {
         CU16String { buf: buf, len: len }
     }
 
-    /// Converts the CU16String into a `&[u8]` without copying.
+    /// Converts the CU16String into a `&[u16]` without copying.
     /// NULL is not included.
     ///
     /// # Failure
@@ -71,7 +71,7 @@ pub trait ToCU16Str {
 
 impl<'a> ToCU16Str for &'a str {
     fn to_c_u16(&self) -> Vec<u16> {
-        #[allow(deprecated_owned_vector)];
+        #![allow(deprecated_owned_vector)]
         let mut t = Vec::from_slice(self.to_utf16());
         t.push(0u16);
         t

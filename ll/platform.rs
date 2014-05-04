@@ -1,5 +1,5 @@
-pub use std::libc::*;
-pub use std::libc::types::os::arch::extra::*;
+pub use libc::*;
+pub use libc::types::os::arch::extra::*;
 
 // small portion from winnt.h
 pub type LONG = c_long;

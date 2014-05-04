@@ -1,4 +1,4 @@
-#[feature(globs, macro_rules, phase)];
+#![feature(globs, macro_rules, phase)]
 
 #[phase(syntax, link)] extern crate log;
 
@@ -9,10 +9,13 @@ use std::cell::RefCell;
 use std::default::Default;
 
 use windows::main_window_loop;
-use windows::ll::*;
-use windows::instance::*;
+use windows::ll::windef::{UINT, WPARAM, LPARAM, LRESULT, HBRUSH, HWND};
+use windows::ll::all::{CREATESTRUCT};
+use windows::instance::Instance;
 use windows::resource::*;
-use windows::window::*;
+use windows::window::{WindowImpl, Window, WndClass, WindowParams};
+use windows::window::{OnCreate, OnSize, OnDestroy, OnPaint, OnFocus};
+use windows::window;
 use windows::gdi::PaintDc;
 use windows::font::Font;
 use windows::font;
@@ -41,8 +44,8 @@ impl OnCreate for MainFrame {
         let rect = self.win.client_rect().unwrap();
         let params = WindowParams {
             window_name: ~"Hello World",
-            style: WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL |
-                ES_AUTOVSCROLL | ES_MULTILINE | ES_NOHIDESEL,
+            style: window::WS_CHILD | window::WS_VISIBLE | window::WS_BORDER | window::WS_VSCROLL |
+                window::ES_AUTOVSCROLL | window::ES_MULTILINE | window::ES_NOHIDESEL,
             x: 0,
             y: self.text_height,
             width: rect.right as int,
@@ -130,7 +133,7 @@ impl MainFrame {
 
         let win_params = WindowParams {
             window_name: title,
-            style: WS_OVERLAPPEDWINDOW,
+            style: window::WS_OVERLAPPEDWINDOW,
             x: 0,
             y: 0,
             width: 400,
@@ -140,12 +143,12 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::new(instance, Some(wproc as ~WindowImpl), wnd_class.classname, &win_params)
+        Window::new(instance, Some(wproc as ~WindowImpl:Send), wnd_class.classname, &win_params)
     }
 }
 
 fn main() {
-    init_window_map();
+    window::init_window_map();
 
     let instance = Instance::main_instance();
     let main = MainFrame::new(instance, ~"Hello Rust", 20);

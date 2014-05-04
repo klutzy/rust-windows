@@ -4,21 +4,24 @@ use std;
 
 use collections::HashMap;
 
-use ll::*;
+use libc::{c_int, c_void};
+use ll::all::{WNDCLASSEX, CREATESTRUCT};
+use ll::windef::{HWND, INT, RECT, LPARAM, UINT, WPARAM, LRESULT, HMENU, HBRUSH};
+
 use wchar::*;
 use instance::Instance;
 use resource::*;
 
 pub struct WndClass {
-    classname: ~str,
-    style: uint,
-    icon: Option<Image>,
-    icon_small: Option<Image>,
-    cursor: Option<Image>,
-    background: HBRUSH,
-    menu: MenuResource,
-    cls_extra: int,
-    wnd_extra: int,
+    pub classname: ~str,
+    pub style: uint,
+    pub icon: Option<Image>,
+    pub icon_small: Option<Image>,
+    pub cursor: Option<Image>,
+    pub background: HBRUSH,
+    pub menu: MenuResource,
+    pub cls_extra: int,
+    pub wnd_extra: int,
 }
 
 impl WndClass {
@@ -40,7 +43,7 @@ impl WndClass {
                 hIconSm: self.icon_small.to_handle(),
             };
 
-            let res = unsafe { RegisterClassExW(&wcex) };
+            let res = unsafe { super::ll::all::RegisterClassExW(&wcex) };
             res != 0
         })
     }
@@ -90,20 +93,20 @@ pub static ES_UPPERCASE: u32 = 8;
 pub static ES_WANTRETURN: u32 = 4096;
 
 pub struct WindowParams {
-    window_name: ~str,
-    style: u32,
-    x: int,
-    y: int,
-    width: int,
-    height: int,
-    parent: Window,
-    menu: HMENU,
-    ex_style: u32,
+    pub window_name: ~str,
+    pub style: u32,
+    pub x: int,
+    pub y: int,
+    pub width: int,
+    pub height: int,
+    pub parent: Window,
+    pub menu: HMENU,
+    pub ex_style: u32,
 }
 
 #[deriving(Eq, TotalEq, Hash)]
 pub struct Window {
-    wnd: HWND,
+    pub wnd: HWND,
 }
 
 impl Clone for Window {
@@ -122,7 +125,7 @@ impl Window {
     }
 
     pub fn new(
-        instance: Instance, wproc: Option<~WindowImpl>, classname: &str, params: &WindowParams
+        instance: Instance, wproc: Option<~WindowImpl:Send>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
         match wproc {
             Some(wproc) => {
@@ -134,7 +137,7 @@ impl Window {
         let wnd = unsafe {
             let clsname_u = classname.to_c_u16();
             let title_u = params.window_name.to_c_u16();
-            let wnd = CreateWindowExW(
+            let wnd = super::ll::all::CreateWindowExW(
                 params.ex_style, clsname_u.as_ptr(), title_u.as_ptr(), params.style,
                 params.x as c_int, params.y as c_int,
                 params.width as c_int, params.height as c_int,
@@ -152,15 +155,15 @@ impl Window {
     }
 
     pub fn show(&self, cmd_show: int) -> bool {
-        unsafe { ShowWindow(self.wnd, cmd_show as c_int) == 0 }
+        unsafe { super::ll::all::ShowWindow(self.wnd, cmd_show as c_int) == 0 }
     }
 
     pub fn show_async(&self, cmd_show: int) -> bool {
-        unsafe { ShowWindowAsync(self.wnd, cmd_show as c_int) == 0 }
+        unsafe { super::ll::all::ShowWindowAsync(self.wnd, cmd_show as c_int) == 0 }
     }
 
     pub fn update(&self) -> bool {
-        unsafe { UpdateWindow(self.wnd) == 0 }
+        unsafe { super::ll::all::UpdateWindow(self.wnd) == 0 }
     }
 
     pub fn client_rect(&self) -> Option<RECT> {
@@ -171,7 +174,7 @@ impl Window {
             bottom: 0,
         };
         let res = unsafe {
-            GetClientRect(self.wnd, &mut rect as *mut RECT)
+            super::ll::all::GetClientRect(self.wnd, &mut rect as *mut RECT)
         } != 0;
         match res {
             true => Some(rect),
@@ -184,7 +187,7 @@ impl Window {
     ) -> bool {
         // TODO: hwndInsertAfter
         unsafe {
-            SetWindowPos(
+            super::ll::all::SetWindowPos(
                 self.wnd, ptr::mut_null(), x as c_int, y as c_int,
                 width as c_int, height as c_int, flags
             ) != 0
@@ -194,14 +197,14 @@ impl Window {
     pub fn set_focus(&self) -> Window {
         unsafe {
             Window {
-                wnd: SetFocus(self.wnd)
+                wnd: super::ll::all::SetFocus(self.wnd)
             }
         }
     }
 
     pub fn send_message(&self, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
         unsafe {
-            SendMessageW(self.wnd, msg, wparam, lparam)
+            super::ll::all::SendMessageW(self.wnd, msg, wparam, lparam)
         }
     }
 }
@@ -212,10 +215,10 @@ pub trait WindowImpl {
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
 }
 
-pub type WindowMap = HashMap<Window, ~WindowImpl>;
+pub type WindowMap = HashMap<Window, ~WindowImpl:Send>;
 
 local_data_key!(pub key_win_map: WindowMap)
-local_data_key!(pub key_init_wnd: ~WindowImpl)
+local_data_key!(pub key_init_wnd: ~WindowImpl:Send)
 
 pub fn init_window_map() {
     let win_map: WindowMap = HashMap::new();
@@ -254,7 +257,7 @@ pub trait OnCreate {
 pub trait OnDestroy {
     fn on_destroy(&self) {
         unsafe {
-            PostQuitMessage(0 as c_int);
+            super::ll::all::PostQuitMessage(0 as c_int);
         }
     }
 }

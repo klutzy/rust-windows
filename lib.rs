@@ -1,23 +1,20 @@
-#[feature(globs, phase)];
-#[crate_type = "lib"];
-#[crate_id = "rust-windows"];
+#![feature(globs, phase)]
+#![crate_type = "lib"]
+#![crate_id = "rust-windows"]
 
 #[phase(syntax, link)] extern crate log;
 
+extern crate libc;
 extern crate collections;
 
 use std::ptr;
-use std::vec::Vec;
 
-use ll::*;
+use libc::{LONG};
+use ll::all::{MSG, POINT};
+use ll::windef::{HWND, LPARAM, UINT, WPARAM, LRESULT, DWORD};
 
 pub mod ll {
-    #[allow(non_camel_case_types)];
-
-    pub use ll::platform::*;
-    pub use ll::windef::*;
-    pub use ll::all::*;
-    pub use ll::font::*;
+    #![allow(non_camel_case_types)]
 
     pub mod platform;
     pub mod windef;
@@ -42,7 +39,7 @@ pub fn env() -> Vec<(~str, ~str)> {
         unsafe fn get_env_pairs() -> Vec<~str> {
             extern "system" {
                 fn GetEnvironmentStringsW() -> *u16;
-                fn FreeEnvironmentStringsW(ch: *u16) -> std::libc::BOOL;
+                fn FreeEnvironmentStringsW(ch: *u16) -> libc::BOOL;
             }
 
             let ch = GetEnvironmentStringsW();
@@ -75,11 +72,11 @@ pub fn env() -> Vec<(~str, ~str)> {
 }
 
 pub fn get_last_error() -> DWORD {
-    unsafe { GetLastError() }
+    unsafe { ll::all::GetLastError() }
 }
 
 pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    unsafe { DefWindowProcW(hwnd, msg, w, l) }
+    unsafe { ll::all::DefWindowProcW(hwnd, msg, w, l) }
 }
 
 pub fn main_window_loop() -> uint {
@@ -93,7 +90,7 @@ pub fn main_window_loop() -> uint {
     };
     loop {
         let ret = unsafe {
-            GetMessageW(&msg as *MSG, ptr::mut_null(),
+            ll::all::GetMessageW(&msg as *MSG, ptr::mut_null(),
                     0 as UINT, 0 as UINT)
         };
 
@@ -103,8 +100,8 @@ pub fn main_window_loop() -> uint {
         }
         else {
             unsafe {
-                TranslateMessage(&msg as *MSG);
-                DispatchMessageW(&msg as *MSG);
+                ll::all::TranslateMessage(&msg as *MSG);
+                ll::all::DispatchMessageW(&msg as *MSG);
             }
         }
     }

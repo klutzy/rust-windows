@@ -73,26 +73,26 @@ pub type FARPROC = *u8;
 pub type NEARPROC = *u8;
 pub type PROC = *u8;
 pub struct RECT {
-    left: LONG,
-    top: LONG,
-    right: LONG,
-    bottom: LONG,
+    pub left: LONG,
+    pub top: LONG,
+    pub right: LONG,
+    pub bottom: LONG,
 }
 pub type PRECT = *mut RECT;
 pub type LPRECT = *mut RECT;
 pub type LPCRECT = *RECT;
 pub struct RECTL {
-    left: LONG,
-    top: LONG,
-    right: LONG,
-    bottom: LONG,
+    pub left: LONG,
+    pub top: LONG,
+    pub right: LONG,
+    pub bottom: LONG,
 }
 pub type PRECTL = *mut RECTL;
 pub type LPRECTL = *mut RECTL;
 pub type LPCRECTL = *RECTL;
 pub struct POINT {
-    x: LONG,
-    y: LONG,
+    pub x: LONG,
+    pub y: LONG,
 }
 pub type POINTL = POINT;
 pub type PPOINT = *mut POINT;
@@ -100,8 +100,8 @@ pub type LPPOINT = *mut POINT;
 pub type PPOINTL = *mut POINT;
 pub type LPPOINTL = *mut POINT;
 pub struct Struct_tagSIZE {
-    cx: LONG,
-    cy: LONG,
+    pub cx: LONG,
+    pub cy: LONG,
 }
 pub type SIZE = Struct_tagSIZE;
 pub type SIZEL = Struct_tagSIZE;
@@ -110,8 +110,8 @@ pub type LPSIZE = *mut Struct_tagSIZE;
 pub type PSIZEL = *mut Struct_tagSIZE;
 pub type LPSIZEL = *mut Struct_tagSIZE;
 pub struct Struct_tagPOINTS {
-    x: SHORT,
-    y: SHORT,
+    pub x: SHORT,
+    pub y: SHORT,
 }
 pub type POINTS = Struct_tagPOINTS;
 pub type PPOINTS = *mut Struct_tagPOINTS;

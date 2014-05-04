@@ -1,9 +1,11 @@
-#[allow(non_camel_case_types)];
+#![allow(non_camel_case_types)]
 
 use std::ptr;
 use std::default::Default;
 
-use ll::*;
+use libc::c_int;
+use ll::windef::{DWORD, HFONT};
+use ll::gdi;
 use wchar::*;
 
 pub enum CharSet {
@@ -81,21 +83,21 @@ pub enum Family {
 }
 
 pub struct FontAttr {
-    height: int,
-    width: int,
-    escapement: int,
-    orientation: int,
-    weight: int,
-    italic: bool,
-    underline: bool,
-    strike_out: bool,
-    char_set: CharSet,
-    output_precision: OutputPrecision,
-    clip_precision: ClipPrecision,
-    quality: Quality,
-    pitch: Pitch,
-    family: Family,
-    face: Option<~str>,
+    pub height: int,
+    pub width: int,
+    pub escapement: int,
+    pub orientation: int,
+    pub weight: int,
+    pub italic: bool,
+    pub underline: bool,
+    pub strike_out: bool,
+    pub char_set: CharSet,
+    pub output_precision: OutputPrecision,
+    pub clip_precision: ClipPrecision,
+    pub quality: Quality,
+    pub pitch: Pitch,
+    pub family: Family,
+    pub face: Option<~str>,
 }
 
 impl Default for FontAttr {
@@ -121,7 +123,7 @@ impl Default for FontAttr {
 }
 
 pub struct Font {
-    font: HFONT,
+    pub font: HFONT,
 }
 
 impl Clone for Font {
@@ -136,7 +138,7 @@ impl Font {
     pub fn new(attr: &FontAttr) -> Option<Font> {
         let face = attr.face.to_c_u16();
         let hfont = unsafe {
-            CreateFontW(
+            gdi::CreateFontW(
                 attr.height as c_int,
                 attr.width as c_int,
                 attr.escapement as c_int,
