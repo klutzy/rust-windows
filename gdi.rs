@@ -1,9 +1,8 @@
 use std::ptr;
 
 use libc::c_int;
-use libc::{LONG, BOOL, BYTE, HANDLE, DWORD};
 use ll::all::PAINTSTRUCT;
-use ll::windef::{HDC, HWND, RECT, HBITMAP, HGDIOBJ};
+use ll::types::{HDC, HWND, RECT, HBITMAP, HANDLE, BOOL, DWORD, LONG, BYTE, HGDIOBJ};
 use ll::gdi;
 use font::Font;
 use window::WindowImpl;

@@ -1,6 +1,6 @@
 use std::ptr;
 
-use ll::windef::HINSTANCE;
+use ll::types::HINSTANCE;
 
 pub struct Instance {
     pub instance: HINSTANCE

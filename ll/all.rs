@@ -1,5 +1,6 @@
-use ll::platform::*;
-use ll::windef::*;
+use libc::*;
+
+use ll::types::*;
 
 // extern "system" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
 pub type WNDPROC = *c_void;
@@ -12,7 +13,7 @@ pub struct SECURITY_ATTRIBUTES {
 
 pub struct PROCESS_INFORMATION {
     pub hProcess: HANDLE,
-    pub hTread: HANDLE,
+    pub hThread: HANDLE,
     pub dwProcessId: DWORD,
     pub dwThreadId: DWORD,
 }
@@ -105,8 +106,8 @@ extern "system" {
         dwCreationFlags: DWORD,
         lpEnvironment: LPVOID,
         lpCurrentDirectory: LPCWSTR,
-        lpStartupInfo: LPSTARTUPINFO,
-        lpProcessInformation: LPPROCESS_INFORMATION
+        lpStartupInfo: *mut STARTUPINFO,
+        lpProcessInformation: *mut PROCESS_INFORMATION
     ) -> BOOL;
 }
 

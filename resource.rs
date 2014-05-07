@@ -1,11 +1,9 @@
-#![allow(non_camel_case_types)]
-
 use std::ptr;
 use std;
 
 use libc::c_int;
 use libc::HANDLE;
-use ll::windef::{UINT};
+use ll::types::UINT;
 
 use wchar::ToCU16Str;
 use instance::Instance;
@@ -23,6 +21,7 @@ impl<T: ToHandle> ToHandle for Option<T> {
     }
 }
 
+#[allow(non_camel_case_types)]
 pub enum ImageType {
     IMAGE_BITMAP = 0,
     IMAGE_ICON = 1,

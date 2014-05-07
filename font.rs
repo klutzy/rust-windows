@@ -4,9 +4,9 @@ use std::ptr;
 use std::default::Default;
 
 use libc::c_int;
-use ll::windef::{DWORD, HFONT};
+use ll::types::{DWORD, HFONT};
 use ll::gdi;
-use wchar::*;
+use wchar::ToCU16Str;
 
 pub enum CharSet {
     ANSI_CHARSET = 0,

@@ -1,6 +1,6 @@
 use libc::c_int;
 use libc::types::os::arch::extra::{LPCWSTR, LPWSTR};
-use ll::windef::{HDC, BOOL, HBITMAP, HGDIOBJ, DWORD, HFONT};
+use ll::types::{HDC, BOOL, HBITMAP, HGDIOBJ, DWORD, HFONT};
 
 #[link(name = "gdi32")]
 extern "system" {

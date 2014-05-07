@@ -11,17 +11,9 @@ use std::ptr;
 
 use libc::{LONG};
 use ll::all::{MSG, POINT};
-use ll::windef::{HWND, LPARAM, UINT, WPARAM, LRESULT, DWORD};
+use ll::types::{HWND, LPARAM, UINT, WPARAM, LRESULT, DWORD};
 
-pub mod ll {
-    #![allow(non_camel_case_types)]
-
-    pub mod platform;
-    pub mod windef;
-    pub mod all;
-    pub mod font;
-    pub mod gdi;
-}
+pub mod ll;
 
 pub mod instance;
 pub mod resource;

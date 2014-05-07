@@ -6,9 +6,9 @@ use collections::HashMap;
 
 use libc::{c_int, c_void};
 use ll::all::{WNDCLASSEX, CREATESTRUCT};
-use ll::windef::{HWND, INT, RECT, LPARAM, UINT, WPARAM, LRESULT, HMENU, HBRUSH};
+use ll::types::{HWND, INT, RECT, LPARAM, UINT, WPARAM, LRESULT, HMENU, HBRUSH};
 
-use wchar::*;
+use wchar::ToCU16Str;
 use instance::Instance;
 use resource::*;
 

@@ -9,7 +9,7 @@ use std::cell::RefCell;
 use std::default::Default;
 
 use windows::main_window_loop;
-use windows::ll::windef::{UINT, WPARAM, LPARAM, LRESULT, HBRUSH, HWND};
+use windows::ll::types::{UINT, WPARAM, LPARAM, LRESULT, HBRUSH, HWND};
 use windows::ll::all::{CREATESTRUCT};
 use windows::instance::Instance;
 use windows::resource::*;
