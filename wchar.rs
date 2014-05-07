@@ -37,7 +37,7 @@ impl fmt::Show for CU16String {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = if self.buf.is_null() {
-            ~""
+            "".to_owned()
         } else {
             str::from_utf16_lossy(self.as_u16_vec())
         };

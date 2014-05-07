@@ -43,7 +43,7 @@ impl OnCreate for MainFrame {
     fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
         let rect = self.win.client_rect().unwrap();
         let params = WindowParams {
-            window_name: ~"Hello World",
+            window_name: "Hello World".to_owned(),
             style: window::WS_CHILD | window::WS_VISIBLE | window::WS_BORDER | window::WS_VSCROLL |
                 window::ES_AUTOVSCROLL | window::ES_MULTILINE | window::ES_NOHIDESEL,
             x: 0,
@@ -108,7 +108,7 @@ impl MainFrame {
     fn new(instance: Instance, title: ~str, text_height: int) -> Option<Window> {
         let icon = Image::load_resource(instance, IDI_ICON, IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
-            classname: ~"MainFrame",
+            classname: "MainFrame".to_owned(),
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
             icon: icon,
             icon_small: None,
@@ -151,7 +151,7 @@ fn main() {
     window::init_window_map();
 
     let instance = Instance::main_instance();
-    let main = MainFrame::new(instance, ~"Hello Rust", 20);
+    let main = MainFrame::new(instance, "Hello Rust".to_owned(), 20);
     let main = main.unwrap();
 
     main.show(1);

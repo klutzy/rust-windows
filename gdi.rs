@@ -19,7 +19,7 @@ impl Dc {
 
     pub fn text_out(&self, x: int, y: int, s: &str) -> bool {
         #![allow(deprecated_owned_vector)]
-        let mut s16 = s.to_utf16();
+        let mut s16 = Vec::from_slice(s.to_utf16());
         let len = s16.len();
 
         s16.push(0u16);
