@@ -7,6 +7,7 @@ extern crate windows = "rust-windows";
 use std::ptr;
 use std::cell::RefCell;
 use std::default::Default;
+use std::owned::Box;
 
 use windows::main_window_loop;
 use windows::ll::types::{UINT, WPARAM, LPARAM, LRESULT, HBRUSH, HWND};
@@ -123,7 +124,7 @@ impl MainFrame {
             return None;
         }
 
-        let wproc = ~MainFrame {
+        let wproc = box MainFrame {
             win: Window::null(),
             title: title.clone(),
             text_height: text_height,
@@ -143,7 +144,7 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::new(instance, Some(wproc as ~WindowImpl:Send), wnd_class.classname, &win_params)
+        Window::new(instance, Some(wproc as Box<WindowImpl:Send>), wnd_class.classname, &win_params)
     }
 }
 

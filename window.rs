@@ -1,5 +1,6 @@
 use std::local_data;
 use std::ptr;
+use std::owned::Box;
 use std;
 
 use collections::HashMap;
@@ -125,7 +126,7 @@ impl Window {
     }
 
     pub fn new(
-        instance: Instance, wproc: Option<~WindowImpl:Send>, classname: &str, params: &WindowParams
+        instance: Instance, wproc: Option<Box<WindowImpl:Send>>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
         match wproc {
             Some(wproc) => {
@@ -215,10 +216,10 @@ pub trait WindowImpl {
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
 }
 
-pub type WindowMap = HashMap<Window, ~WindowImpl:Send>;
+pub type WindowMap = HashMap<Window, Box<WindowImpl:Send>>;
 
 local_data_key!(pub key_win_map: WindowMap)
-local_data_key!(pub key_init_wnd: ~WindowImpl:Send)
+local_data_key!(pub key_init_wnd: Box<WindowImpl:Send>)
 
 pub fn init_window_map() {
     let win_map: WindowMap = HashMap::new();
