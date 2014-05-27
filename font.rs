@@ -97,7 +97,7 @@ pub struct FontAttr {
     pub quality: Quality,
     pub pitch: Pitch,
     pub family: Family,
-    pub face: Option<~str>,
+    pub face: Option<String>,
 }
 
 impl Default for FontAttr {

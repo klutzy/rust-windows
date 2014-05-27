@@ -1,5 +1,6 @@
-#![feature(globs, phase)]
+#![feature(globs, phase, macro_rules)]
 #![crate_type = "lib"]
+#![crate_type = "dylib"]
 #![crate_id = "rust-windows"]
 
 #[phase(syntax, link)] extern crate log;
@@ -15,6 +16,7 @@ use ll::types::{HWND, LPARAM, UINT, WPARAM, LRESULT, DWORD};
 
 pub mod ll;
 
+pub mod macros;
 pub mod instance;
 pub mod resource;
 pub mod font;
@@ -22,46 +24,6 @@ pub mod wchar;
 pub mod window;
 pub mod gdi;
 pub mod dialog;
-
-/// Returns a vector of (variable, value) pairs for all the environment
-/// variables of the current process.
-/// This is unicode-version of `std::os::env()`.
-pub fn env() -> Vec<(~str, ~str)> {
-    unsafe {
-        unsafe fn get_env_pairs() -> Vec<~str> {
-            extern "system" {
-                fn GetEnvironmentStringsW() -> *u16;
-                fn FreeEnvironmentStringsW(ch: *u16) -> libc::BOOL;
-            }
-
-            let ch = GetEnvironmentStringsW();
-            if ch.is_null() {
-                fail!("os::env() failure getting env string from OS: {}",
-                       std::os::last_os_error());
-            }
-            let mut result = Vec::new();
-            wchar::from_c_u16_multistring(ch as *u16, None, |cstr| {
-                result.push(cstr.to_str());
-            });
-            FreeEnvironmentStringsW(ch);
-            result
-        }
-
-        fn env_convert(input: Vec<~str>) -> Vec<(~str, ~str)> {
-            let mut pairs = Vec::new();
-            for p in input.iter() {
-                let vs: Vec<&str> = p.splitn('=', 1).collect();
-                debug!("splitting: vs: {:?} len: {}", vs, vs.len());
-                assert_eq!(vs.len(), 2);
-                pairs.push((vs.get(0).to_owned(), vs.get(1).to_owned()));
-            }
-            pairs
-        }
-        let unparsed_environ = get_env_pairs();
-        debug!("unp: {:?}", unparsed_environ);
-        env_convert(unparsed_environ)
-    }
-}
 
 pub fn get_last_error() -> DWORD {
     unsafe { ll::all::GetLastError() }

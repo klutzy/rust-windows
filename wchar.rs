@@ -1,4 +1,4 @@
-use std::cast;
+use std::mem;
 use std::ptr;
 use std::str;
 use std::fmt;
@@ -28,7 +28,7 @@ impl CU16String {
     pub fn as_u16_vec<'a>(&'a self) -> &'a [u16] {
         if self.buf.is_null() { fail!("CU16String is null!"); }
         unsafe {
-            cast::transmute((self.buf, self.len - 1))
+            mem::transmute((self.buf, self.len - 1))
         }
     }
 }
@@ -72,11 +72,18 @@ pub trait ToCU16Str {
 impl<'a> ToCU16Str for &'a str {
     fn to_c_u16(&self) -> Vec<u16> {
         #![allow(deprecated_owned_vector)]
-        let mut t = Vec::from_slice(self.to_utf16());
+        let mut t = Vec::from_slice(self.to_utf16().as_slice());
         t.push(0u16);
         t
     }
 }
+
+impl ToCU16Str for String {
+    fn to_c_u16(&self) -> Vec<u16> {
+        self.as_slice().to_c_u16()
+    }
+}
+
 
 impl<S: Str> ToCU16Str for Option<S> {
     fn to_c_u16(&self) -> Vec<u16> {

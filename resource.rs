@@ -36,7 +36,7 @@ impl Image {
     pub fn load_resource(instance: Instance, id: int, img_type: ImageType, width: int, height: int) -> Option<Image> {
         let img = unsafe {
             super::ll::all::LoadImageW(
-                instance.instance, std::cast::transmute(id), img_type as UINT,
+                instance.instance, std::mem::transmute(id), img_type as UINT,
                 width as c_int, height as c_int, 0x8000
             )
         };
@@ -72,7 +72,7 @@ impl MenuResource {
                 let u = s.as_slice().to_c_u16();
                 f(u.as_ptr())
             }
-            MenuId(id) => unsafe { f(std::cast::transmute(id)) },
+            MenuId(id) => unsafe { f(std::mem::transmute(id)) },
         }
     }
 

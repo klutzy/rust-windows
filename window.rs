@@ -1,7 +1,7 @@
-use std::local_data;
 use std::ptr;
 use std::owned::Box;
 use std;
+use std::cell::RefCell;
 
 use collections::HashMap;
 
@@ -14,7 +14,7 @@ use instance::Instance;
 use resource::*;
 
 pub struct WndClass {
-    pub classname: ~str,
+    pub classname: String,
     pub style: uint,
     pub icon: Option<Image>,
     pub icon_small: Option<Image>,
@@ -94,7 +94,7 @@ pub static ES_UPPERCASE: u32 = 8;
 pub static ES_WANTRETURN: u32 = 4096;
 
 pub struct WindowParams {
-    pub window_name: ~str,
+    pub window_name: String,
     pub style: u32,
     pub x: int,
     pub y: int,
@@ -128,12 +128,7 @@ impl Window {
     pub fn new(
         instance: Instance, wproc: Option<Box<WindowImpl:Send>>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
-        match wproc {
-            Some(wproc) => {
-                local_data::set(key_init_wnd, wproc);
-            },
-            None => {},
-        }
+        key_init_wnd.replace(wproc);
 
         let wnd = unsafe {
             let clsname_u = classname.to_c_u16();
@@ -216,37 +211,35 @@ pub trait WindowImpl {
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
 }
 
-pub type WindowMap = HashMap<Window, Box<WindowImpl:Send>>;
-
-local_data_key!(pub key_win_map: WindowMap)
+local_data_key!(pub key_win_map: RefCell<HashMap<Window, Box<WindowImpl:Send>>>)
 local_data_key!(pub key_init_wnd: Box<WindowImpl:Send>)
 
 pub fn init_window_map() {
-    let win_map: WindowMap = HashMap::new();
-    local_data::set(key_win_map, win_map);
+    let win_map = HashMap::new();
+    let _old_map = key_win_map.replace(Some(RefCell::new(win_map)));
+    debug_assert!(_old_map.is_none());
 }
 
 pub extern "system" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
     debug!("main_wnd_proc: wnd {:?} / msg 0x{:x} / w {:?} / l {:?}", wnd, msg as uint, w, l);
     let win = Window { wnd: wnd };
-    let null_proc = local_data::pop(key_init_wnd);
+    let null_proc = key_init_wnd.replace(None);
     match null_proc {
-        Some(nproc) => {
+        Some(mut nproc) => {
             // hello newcomer.
-            let mut nproc = nproc;
             nproc.wnd_mut().wnd = wnd;
-            let mut wmap = local_data::pop(key_win_map).unwrap();
-            wmap.insert(win, nproc);
-            local_data::set(key_win_map, wmap); // XXX?
-
+            let wmap = key_win_map.get().expect("key_win_map null");
+            (*wmap).borrow_mut().insert(win, nproc);
         },
         None => {}
     };
-    local_data::get(key_win_map, |wmap| {
-        let wmap = wmap.unwrap();
-        let wproc = wmap.find(&win).unwrap();
-        wproc.wnd_proc(msg, w, l)
-    })
+
+    let wmap = key_win_map.get().expect("key_win_map null");
+    let wmap = wmap.borrow();
+    let wproc = {
+        wmap.find(&win).unwrap()
+    };
+    wproc.wnd_proc(msg, w, l)
 }
 
 pub trait OnCreate {

@@ -1,7 +1,9 @@
 #![feature(globs, macro_rules, phase)]
 
-#[phase(syntax, link)] extern crate log;
+#[phase(syntax, link)]
+extern crate log;
 
+#[phase(syntax, link)]
 extern crate windows = "rust-windows";
 
 use std::ptr;
@@ -10,8 +12,8 @@ use std::default::Default;
 use std::owned::Box;
 
 use windows::main_window_loop;
-use windows::ll::types::{UINT, WPARAM, LPARAM, LRESULT, HBRUSH, HWND};
-use windows::ll::all::{CREATESTRUCT};
+use windows::ll::types::{UINT, HBRUSH};
+use windows::ll::all::CREATESTRUCT;
 use windows::instance::Instance;
 use windows::resource::*;
 use windows::window::{WindowImpl, Window, WndClass, WindowParams};
@@ -21,9 +23,6 @@ use windows::gdi::PaintDc;
 use windows::font::Font;
 use windows::font;
 
-#[path = "../wnd_proc_macro.rs"]
-mod macro;
-
 // TODO duplicate of hello.rc
 static IDI_ICON: int = 0x101;
 static MENU_MAIN: int = 0x201;
@@ -32,7 +31,7 @@ static MENU_MAIN: int = 0x201;
 
 struct MainFrame {
     win: Window,
-    title: ~str,
+    title: String,
     text_height: int,
     edit: RefCell<Option<Window>>,
     font: RefCell<Option<Font>>,
@@ -44,7 +43,7 @@ impl OnCreate for MainFrame {
     fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
         let rect = self.win.client_rect().unwrap();
         let params = WindowParams {
-            window_name: "Hello World".to_owned(),
+            window_name: "Hello World".to_strbuf(),
             style: window::WS_CHILD | window::WS_VISIBLE | window::WS_BORDER | window::WS_VSCROLL |
                 window::ES_AUTOVSCROLL | window::ES_MULTILINE | window::ES_NOHIDESEL,
             x: 0,
@@ -67,7 +66,7 @@ impl OnCreate for MainFrame {
                     Some(f) => {
                         static WM_SETFONT: UINT = 0x0030;
                         unsafe {
-                            e.send_message(WM_SETFONT, std::cast::transmute(f.font), 0);
+                            e.send_message(WM_SETFONT, std::mem::transmute(f.font), 0);
                         }
                         *self.edit.borrow_mut() = Some(e);
                         *self.font.borrow_mut() = Some(f);
@@ -95,7 +94,7 @@ impl OnPaint for MainFrame {
         let font = self.font.borrow();
         let pdc = PaintDc::new(self).expect("Paint DC");
         pdc.dc.select_font(&font.expect("font is empty"));
-        pdc.dc.text_out(0, 0, self.title);
+        pdc.dc.text_out(0, 0, self.title.as_slice());
     }
 }
 
@@ -106,10 +105,10 @@ impl OnFocus for MainFrame {
 }
 
 impl MainFrame {
-    fn new(instance: Instance, title: ~str, text_height: int) -> Option<Window> {
+    fn new(instance: Instance, title: String, text_height: int) -> Option<Window> {
         let icon = Image::load_resource(instance, IDI_ICON, IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
-            classname: "MainFrame".to_owned(),
+            classname: "MainFrame".to_strbuf(),
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
             icon: icon,
             icon_small: None,
@@ -144,7 +143,8 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::new(instance, Some(wproc as Box<WindowImpl:Send>), wnd_class.classname, &win_params)
+        Window::new(instance, Some(wproc as Box<WindowImpl:Send>),
+                    wnd_class.classname.as_slice(), &win_params)
     }
 }
 
@@ -152,7 +152,7 @@ fn main() {
     window::init_window_map();
 
     let instance = Instance::main_instance();
-    let main = MainFrame::new(instance, "Hello Rust".to_owned(), 20);
+    let main = MainFrame::new(instance, "Hello Rust".to_strbuf(), 20);
     let main = main.unwrap();
 
     main.show(1);
