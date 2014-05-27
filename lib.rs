@@ -24,6 +24,7 @@ pub mod wchar;
 pub mod window;
 pub mod gdi;
 pub mod dialog;
+pub mod com;
 
 pub fn get_last_error() -> DWORD {
     unsafe { ll::all::GetLastError() }

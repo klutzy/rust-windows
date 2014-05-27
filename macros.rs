@@ -71,3 +71,16 @@ macro_rules! wnd_proc(
 
     )
 )
+
+#[macro_export]
+macro_rules! guid(
+    ($d1:expr, $d2:expr, $d3:expr,
+     $d41:expr, $d42:expr, $d43:expr, $d44:expr, $d45:expr, $d46:expr, $d47:expr, $d48:expr) => (
+        ::windows::com::GUID {
+            data1: $d1,
+            data2: $d2,
+            data3: $d3,
+            data4: [$d41, $d42, $d43, $d44, $d45, $d46, $d47, $d48],
+        }
+    )
+)
