@@ -1,10 +1,12 @@
 #![feature(globs, macro_rules, phase)]
 
-#[phase(syntax, link)]
+#[phase(plugin, link)]
 extern crate log;
 
-#[phase(syntax, link)]
+#[phase(plugin, link)]
 extern crate windows = "rust-windows";
+
+extern crate debug;
 
 use std::ptr;
 use std::cell::RefCell;
@@ -43,7 +45,7 @@ impl OnCreate for MainFrame {
     fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
         let rect = self.win.client_rect().unwrap();
         let params = WindowParams {
-            window_name: "Hello World".to_strbuf(),
+            window_name: "Hello World".to_string(),
             style: window::WS_CHILD | window::WS_VISIBLE | window::WS_BORDER | window::WS_VSCROLL |
                 window::ES_AUTOVSCROLL | window::ES_MULTILINE | window::ES_NOHIDESEL,
             x: 0,
@@ -108,7 +110,7 @@ impl MainFrame {
     fn new(instance: Instance, title: String, text_height: int) -> Option<Window> {
         let icon = Image::load_resource(instance, IDI_ICON, IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
-            classname: "MainFrame".to_strbuf(),
+            classname: "MainFrame".to_string(),
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
             icon: icon,
             icon_small: None,
@@ -143,7 +145,7 @@ impl MainFrame {
             ex_style: 0,
         };
 
-        Window::new(instance, Some(wproc as Box<WindowImpl:Send>),
+        Window::new(instance, Some(wproc as Box<WindowImpl+Send>),
                     wnd_class.classname.as_slice(), &win_params)
     }
 }
@@ -152,7 +154,7 @@ fn main() {
     window::init_window_map();
 
     let instance = Instance::main_instance();
-    let main = MainFrame::new(instance, "Hello Rust".to_strbuf(), 20);
+    let main = MainFrame::new(instance, "Hello Rust".to_string(), 20);
     let main = main.unwrap();
 
     main.show(1);
