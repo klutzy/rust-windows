@@ -3,7 +3,7 @@ use std::owned::Box;
 use std;
 use std::cell::RefCell;
 
-use collections::HashMap;
+use std::collections::HashMap;
 
 use libc::{c_int, c_void};
 use ll::all::{WNDCLASSEX, CREATESTRUCT};
@@ -105,7 +105,7 @@ pub struct WindowParams {
     pub ex_style: u32,
 }
 
-#[deriving(Eq, TotalEq, Hash)]
+#[deriving(PartialEq, Eq, Hash)]
 pub struct Window {
     pub wnd: HWND,
 }
@@ -126,7 +126,7 @@ impl Window {
     }
 
     pub fn new(
-        instance: Instance, wproc: Option<Box<WindowImpl:Send>>, classname: &str, params: &WindowParams
+        instance: Instance, wproc: Option<Box<WindowImpl + Send>>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
         key_init_wnd.replace(wproc);
 
@@ -211,8 +211,8 @@ pub trait WindowImpl {
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
 }
 
-local_data_key!(pub key_win_map: RefCell<HashMap<Window, Box<WindowImpl:Send>>>)
-local_data_key!(pub key_init_wnd: Box<WindowImpl:Send>)
+local_data_key!(pub key_win_map: RefCell<HashMap<Window, Box<WindowImpl+Send>>>)
+local_data_key!(pub key_init_wnd: Box<WindowImpl+Send>)
 
 pub fn init_window_map() {
     let win_map = HashMap::new();

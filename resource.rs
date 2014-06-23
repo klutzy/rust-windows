@@ -61,7 +61,7 @@ impl ToHandle for Image {
 }
 
 pub enum MenuResource {
-    MenuName(~str),
+    MenuName(String),
     MenuId(int),
 }
 

@@ -37,7 +37,7 @@ impl fmt::Show for CU16String {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = if self.buf.is_null() {
-            "".to_owned()
+            "".to_string()
         } else {
             str::from_utf16_lossy(self.as_u16_vec())
         };
@@ -71,7 +71,6 @@ pub trait ToCU16Str {
 
 impl<'a> ToCU16Str for &'a str {
     fn to_c_u16(&self) -> Vec<u16> {
-        #![allow(deprecated_owned_vector)]
         let mut t = Vec::from_slice(self.to_utf16().as_slice());
         t.push(0u16);
         t
