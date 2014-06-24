@@ -3,10 +3,11 @@
 #![crate_type = "dylib"]
 #![crate_id = "rust-windows"]
 
-#[phase(syntax, link)] extern crate log;
+#[phase(plugin, link)] extern crate log;
 
 extern crate libc;
 extern crate collections;
+extern crate debug;
 
 use std::ptr;
 
