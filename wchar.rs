@@ -6,14 +6,14 @@ use std::vec::Vec;
 
 // Helper struct for *u16 manipulation.
 pub struct CU16String {
-    buf: *u16,
+    buf: *const u16,
     /// length of buffer, including null
     len: uint,
 }
 
 impl CU16String {
     /// Create a CU16String from a pointer.
-    pub unsafe fn new(buf: *u16) -> CU16String {
+    pub unsafe fn new(buf: *const u16) -> CU16String {
         let len = ptr::position(buf, |c| *c == 0) + 1;
         CU16String { buf: buf, len: len }
     }
@@ -47,7 +47,7 @@ impl fmt::Show for CU16String {
 
 /// Parses a C utf-16 "multistring".
 /// See `std::c_str::from_c_multistring` for detailed explanation.
-pub unsafe fn from_c_u16_multistring(buf: *u16, count: Option<uint>, f: |&[u16]|) -> uint {
+pub unsafe fn from_c_u16_multistring(buf: *const u16, count: Option<uint>, f: |&[u16]|) -> uint {
     let mut curr_ptr: uint = buf as uint;
     let mut ctr = 0;
     let (limited_count, limit) = match count {
@@ -55,8 +55,8 @@ pub unsafe fn from_c_u16_multistring(buf: *u16, count: Option<uint>, f: |&[u16]|
         None => (false, 0)
     };
     while ((limited_count && ctr < limit) || !limited_count)
-          && *(curr_ptr as *u16) != 0 as u16 {
-        let cstr = CU16String::new(curr_ptr as *u16);
+          && *(curr_ptr as *const u16) != 0 as u16 {
+        let cstr = CU16String::new(curr_ptr as *const u16);
         f(cstr.as_u16_vec());
         curr_ptr += cstr.len * 2;
         ctr += 1;

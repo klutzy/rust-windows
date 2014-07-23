@@ -32,7 +32,7 @@ impl WndClass {
             let wcex = WNDCLASSEX {
                 cbSize: std::mem::size_of::<WNDCLASSEX>() as UINT,
                 style: self.style as UINT,
-                lpfnWndProc: main_wnd_proc as *c_void,
+                lpfnWndProc: main_wnd_proc as *const c_void,
                 cbClsExtra: self.cls_extra as INT,
                 cbWndExtra: self.wnd_extra as INT,
                 hInstance: instance.instance,

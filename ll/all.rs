@@ -3,7 +3,7 @@ use libc::*;
 use ll::types::*;
 
 // extern "system" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
-pub type WNDPROC = *c_void;
+pub type WNDPROC = *const c_void;
 
 pub struct SECURITY_ATTRIBUTES {
     pub nLength: DWORD,
@@ -100,8 +100,8 @@ extern "system" {
 
     pub fn CreateProcessW(
         lpApplicationName: LPCWSTR, lpCommandLine: LPWSTR,
-        lpProcessAttributes: *SECURITY_ATTRIBUTES,
-        lpThreadAttributes: *SECURITY_ATTRIBUTES,
+        lpProcessAttributes: *const SECURITY_ATTRIBUTES,
+        lpThreadAttributes: *const SECURITY_ATTRIBUTES,
         bInheritHandles: BOOL,
         dwCreationFlags: DWORD,
         lpEnvironment: LPVOID,
@@ -127,25 +127,25 @@ extern "system" {
 
     pub fn BeginPaint(hwnd: HWND, lpPaint: *mut PAINTSTRUCT) -> HDC;
 
-    pub fn EndPaint(hwnd: HWND, lpPaint: *PAINTSTRUCT) -> BOOL;
+    pub fn EndPaint(hwnd: HWND, lpPaint: *const PAINTSTRUCT) -> BOOL;
 
     pub fn MessageBoxW(
             hWnd: HWND, lpText: LPCWSTR, lpCaption: LPCWSTR, uType: UINT
     ) -> c_int;
 
-    pub fn RegisterClassExW(lpwcx: *WNDCLASSEX) -> ATOM;
+    pub fn RegisterClassExW(lpwcx: *const WNDCLASSEX) -> ATOM;
 
     pub fn DefWindowProcW(
             hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM
     ) -> LRESULT;
 
     pub fn GetMessageW(
-            lpMsg: *MSG, hWnd: HWND,
+            lpMsg: *const MSG, hWnd: HWND,
             wMsgFilterMin: UINT, wMsgFilterMAx: UINT
     ) -> BOOL;
 
     pub fn PeekMessageW(
-            lpMsg: *MSG, hWnd: HWND,
+            lpMsg: *const MSG, hWnd: HWND,
             wMsgFilterMin: UINT, wMsgFilterMAx: UINT, wRemoveMsg: UINT
     ) -> BOOL;
 
@@ -155,9 +155,9 @@ extern "system" {
 
     pub fn PostQuitMessage(nExitCode: c_int);
 
-    pub fn TranslateMessage(lpMsg: *MSG) -> BOOL;
+    pub fn TranslateMessage(lpMsg: *const MSG) -> BOOL;
 
-    pub fn DispatchMessageW(lpMsg: *MSG) -> LRESULT;
+    pub fn DispatchMessageW(lpMsg: *const MSG) -> LRESULT;
 
     #[cfg(target_arch = "x86")]
     pub fn GetClassLongW(hwnd: HWND, nIndex: c_int) -> DWORD;

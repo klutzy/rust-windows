@@ -45,7 +45,7 @@ pub fn main_window_loop() -> uint {
     };
     loop {
         let ret = unsafe {
-            ll::all::GetMessageW(&msg as *MSG, ptr::mut_null(),
+            ll::all::GetMessageW(&msg as *const MSG, ptr::mut_null(),
                     0 as UINT, 0 as UINT)
         };
 
@@ -55,8 +55,8 @@ pub fn main_window_loop() -> uint {
         }
         else {
             unsafe {
-                ll::all::TranslateMessage(&msg as *MSG);
-                ll::all::DispatchMessageW(&msg as *MSG);
+                ll::all::TranslateMessage(&msg as *const MSG);
+                ll::all::DispatchMessageW(&msg as *const MSG);
             }
         }
     }
