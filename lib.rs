@@ -1,7 +1,7 @@
 #![feature(globs, phase, macro_rules)]
 #![crate_type = "lib"]
 #![crate_type = "dylib"]
-#![crate_id = "rust-windows"]
+#![crate_name = "rust-windows"]
 
 #[phase(plugin, link)] extern crate log;
 
