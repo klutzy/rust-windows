@@ -64,7 +64,7 @@ pub type WPARAM = UINT_PTR;
 pub type LPBOOL = *mut BOOL;
 pub type LPBYTE = *mut BYTE;
 pub type LPCOLORREF = *mut DWORD;
-pub type LPCVOID = *c_void;
+pub type LPCVOID = *const c_void;
 pub type LPDWORD = *mut DWORD;
 pub type LPHANDLE = *mut HANDLE;
 pub type LPINT = *mut c_int;
@@ -98,15 +98,15 @@ pub type SHORT = c_short;
 pub type VOID = c_void;
 pub type WCHAR = wchar_t;
 
-pub type LPCSTR = *CHAR;
-pub type LPCWSTR = *WCHAR;
+pub type LPCSTR = *const CHAR;
+pub type LPCWSTR = *const WCHAR;
 pub type LPSTR = *mut CHAR;
 pub type LPWSTR = *mut WCHAR;
 
 pub type PBOOLEAN = *mut BOOLEAN;
 pub type PCHAR = *mut CHAR;
-pub type PCSTR = *CHAR;
-pub type PCWSTR = *WCHAR;
+pub type PCSTR = *const CHAR;
+pub type PCWSTR = *const WCHAR;
 pub type PDWORDLONG = *mut DWORDLONG;
 pub type PHANDLE = *mut HANDLE;
 pub type PLCID = PDWORD;
@@ -215,7 +215,7 @@ pub struct UNICODE_STRING {
     pub Buffer: PWSTR,
 }
 type PUNICODE_STRING = *mut UNICODE_STRING;
-type PCUNICODE_STRING = *UNICODE_STRING;
+type PCUNICODE_STRING = *const UNICODE_STRING;
 
 // not specified
 pub type QWORD = u64; // unsigned __int64
@@ -230,4 +230,4 @@ pub struct RECT {
 }
 pub type PRECT = *mut RECT;
 pub type LPRECT = *mut RECT;
-pub type LPCRECT = *RECT;
+pub type LPCRECT = *const RECT;
