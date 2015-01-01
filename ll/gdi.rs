@@ -9,7 +9,7 @@
 
 use libc::c_int;
 use libc::types::os::arch::extra::{LPCWSTR, LPWSTR};
-use ll::types::{HDC, BOOL, HBITMAP, HGDIOBJ, DWORD, HFONT};
+use ll::types::{HDC, BOOL, HBITMAP, HGDIOBJ, DWORD, HFONT, COLORREF, RECT, HBRUSH};
 
 #[link(name = "gdi32")]
 extern "system" {
@@ -21,10 +21,18 @@ extern "system" {
 
     pub fn SelectObject(hdc: HDC, hgdiobj: HGDIOBJ) -> HGDIOBJ;
 
+    pub fn GetStockObject(fnObject: c_int) -> HGDIOBJ;
+
     pub fn DeleteObject(hObject: HGDIOBJ) -> BOOL;
+
+    pub fn SetDCBrushColor(hdc: HDC, crColor: COLORREF) -> COLORREF;
 
     pub fn BitBlt(hdcDest: HDC, nXDest: c_int, nYDest: c_int, nWidth: c_int, nHeight: c_int,
                   hdcSrc: HDC, nXSrc: c_int, nYSrc: c_int, dwRop: DWORD) -> BOOL;
+
+    pub fn FillRect(hDC: HDC, lprc: *const RECT, hbr: HBRUSH) -> c_int;
+
+    pub fn Rectangle(hDC: HDC, nLeftRect: c_int, nTopRect: c_int, nRightRect: c_int, nBottomRect: c_int) -> BOOL;
 
     pub fn CreateFontW(
         height: c_int, width: c_int, escapement: c_int, orientation: c_int,
@@ -36,4 +44,8 @@ extern "system" {
     pub fn TextOutW(
         hdc: HDC, nXStart: c_int, nYStart: c_int, lpString: LPWSTR, cchString: c_int
     ) -> BOOL;
+
+    pub fn SetTextColor(hdc: HDC, color: COLORREF) -> COLORREF;
+
+    pub fn SetBkColor(hdc: HDC, color: COLORREF) -> COLORREF;
 }

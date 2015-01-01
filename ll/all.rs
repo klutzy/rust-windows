@@ -197,7 +197,11 @@ extern "system" {
         xDesired: c_int, yDesired: c_int, load: UINT
     ) -> HANDLE;
 
+    pub fn GetSysColor(nIndex: c_int) -> DWORD;
+
     pub fn GetClientRect(hwnd: HWND, rect: LPRECT) -> BOOL;
+
+    pub fn InvalidateRect(hwnd: HWND, lpRect: *const RECT, erase: BOOL) -> BOOL;
 
     pub fn SetWindowPos(
         hwnd: HWND, hwndInsertAfter: HWND, x: c_int, y: c_int,
