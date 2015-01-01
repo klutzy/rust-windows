@@ -7,6 +7,7 @@ use ll::gdi;
 use font::Font;
 use window::WindowImpl;
 
+#[deriving(Copy)]
 pub struct Dc {
     pub raw: HDC,
 }
@@ -17,7 +18,7 @@ impl Dc {
     }
 
     pub fn text_out(&self, x: int, y: int, s: &str) -> bool {
-        let mut s16 = s.to_utf16();
+        let mut s16 : Vec<u16> = s.utf16_units().collect();
         let len = s16.len();
 
         s16.push(0u16);
@@ -69,7 +70,7 @@ pub struct PaintDc {
 impl PaintDc {
     pub fn new<W: WindowImpl>(w: &W) -> Option<PaintDc> {
         let mut ps = PAINTSTRUCT {
-            hdc: ptr::mut_null(),
+            hdc: ptr::null_mut(),
             fErase: 0 as BOOL,
             rcPaint: RECT {
                 left: 0 as LONG, top: 0 as LONG,

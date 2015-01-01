@@ -1,10 +1,9 @@
 use std::mem;
-use std::ptr;
-use std::str;
 use std::fmt;
 use std::vec::Vec;
 
 // Helper struct for *u16 manipulation.
+#[allow(missing_copy_implementations)]
 pub struct CU16String {
     buf: *const u16,
     /// length of buffer, including null
@@ -14,8 +13,19 @@ pub struct CU16String {
 impl CU16String {
     /// Create a CU16String from a pointer.
     pub unsafe fn new(buf: *const u16) -> CU16String {
-        let len = ptr::position(buf, |c| *c == 0) + 1;
-        CU16String { buf: buf, len: len }
+        CU16String { 
+            buf: buf, 
+            len: {
+                let mut length_counter = 0;
+                loop {
+                    if *buf.offset(length_counter)==0 {
+                        break;
+                    }
+                    length_counter += 1;
+                }
+                length_counter as uint
+            }
+        }
     }
 
     /// Converts the CU16String into a `&[u16]` without copying.
@@ -26,7 +36,7 @@ impl CU16String {
     /// Fails if the CU16String is null.
     #[inline]
     pub fn as_u16_vec<'a>(&'a self) -> &'a [u16] {
-        if self.buf.is_null() { fail!("CU16String is null!"); }
+        if self.buf.is_null() { panic!("CU16String is null!"); }
         unsafe {
             mem::transmute((self.buf, self.len - 1))
         }
@@ -39,7 +49,7 @@ impl fmt::Show for CU16String {
         let s = if self.buf.is_null() {
             "".to_string()
         } else {
-            str::from_utf16_lossy(self.as_u16_vec())
+            String::from_utf16_lossy(self.as_u16_vec())
         };
         s.fmt(f)
     }
@@ -71,7 +81,7 @@ pub trait ToCU16Str {
 
 impl<'a> ToCU16Str for &'a str {
     fn to_c_u16(&self) -> Vec<u16> {
-        let mut t = Vec::from_slice(self.to_utf16().as_slice());
+        let mut t : Vec<u16> = self.utf16_units().collect();
         t.push(0u16);
         t
     }

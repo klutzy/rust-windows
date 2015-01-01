@@ -7,7 +7,6 @@
 
 extern crate libc;
 extern crate collections;
-extern crate debug;
 
 use std::ptr;
 
@@ -36,7 +35,7 @@ pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
 
 pub fn main_window_loop() -> uint {
     let msg = MSG {
-        hwnd: ptr::mut_null(),
+        hwnd: ptr::null_mut(),
         message: 0 as UINT,
         wParam: 0 as WPARAM,
         lParam: 0 as LPARAM,
@@ -45,7 +44,7 @@ pub fn main_window_loop() -> uint {
     };
     loop {
         let ret = unsafe {
-            ll::all::GetMessageW(&msg as *const MSG, ptr::mut_null(),
+            ll::all::GetMessageW(&msg as *const MSG, ptr::null_mut(),
                     0 as UINT, 0 as UINT)
         };
 

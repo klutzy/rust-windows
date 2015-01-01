@@ -1,16 +1,20 @@
-use libc::*;
+#![allow(non_snake_case)]
 
 use ll::types::*;
 
 // extern "system" fn(HWND, UINT, WPARAM, LPARAM) -> LRESULT
 pub type WNDPROC = *const c_void;
 
+#[repr(C)]
+#[deriving(Copy)]
 pub struct SECURITY_ATTRIBUTES {
     pub nLength: DWORD,
     pub lpSecurityDescriptor: LPVOID,
     pub bInheritHandle: BOOL,
 }
 
+#[repr(C)]
+#[deriving(Copy)]
 pub struct PROCESS_INFORMATION {
     pub hProcess: HANDLE,
     pub hThread: HANDLE,
@@ -18,6 +22,8 @@ pub struct PROCESS_INFORMATION {
     pub dwThreadId: DWORD,
 }
 
+#[repr(C)]
+#[deriving(Copy)]
 pub struct STARTUPINFO {
     pub cb: DWORD,
     pub lpReserved: LPWSTR,
@@ -39,6 +45,8 @@ pub struct STARTUPINFO {
     pub hStdError: HANDLE,
 }
 
+#[repr(C)]
+#[deriving(Copy)]
 pub struct WNDCLASSEX {
     pub cbSize: UINT,
     pub style: UINT,
@@ -54,6 +62,8 @@ pub struct WNDCLASSEX {
     pub hIconSm: HICON,
 }
 
+#[repr(C)]
+#[deriving(Copy)]
 pub struct CREATESTRUCT {
     pub lpCreateParams: LPVOID,
     pub hInstance: HINSTANCE,
@@ -69,11 +79,15 @@ pub struct CREATESTRUCT {
     pub dwExStyle: DWORD,
 }
 
+#[repr(C)]
+#[deriving(Copy)]
 pub struct POINT {
     pub x: LONG,
     pub y: LONG,
 }
 
+#[repr(C)]
+#[deriving(Copy)]
 pub struct MSG {
     pub hwnd: HWND,
     pub message: UINT,
@@ -83,6 +97,8 @@ pub struct MSG {
     pub pt: POINT,
 }
 
+#[deriving(Copy)]
+#[repr(C)]
 pub struct PAINTSTRUCT {
     pub hdc: HDC,
     pub fErase: BOOL,

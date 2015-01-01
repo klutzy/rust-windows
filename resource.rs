@@ -15,19 +15,21 @@ pub trait ToHandle {
 impl<T: ToHandle> ToHandle for Option<T> {
     fn to_handle(&self) -> HANDLE {
         match *self {
-            None => ptr::mut_null(),
+            None => ptr::null_mut(),
             Some(ref s) => s.to_handle(),
         }
     }
 }
 
 #[allow(non_camel_case_types)]
+#[deriving(Copy)]
 pub enum ImageType {
     IMAGE_BITMAP = 0,
     IMAGE_ICON = 1,
     IMAGE_CURSOR = 2,
 }
 
+#[deriving(Copy)]
 pub struct Image {
     pub image: HANDLE,
 }
@@ -41,7 +43,7 @@ impl Image {
             )
         };
 
-        if img == ptr::mut_null() {
+        if img == ptr::null_mut() {
             None
         } else {
             Some(Image { image: img })
@@ -49,8 +51,8 @@ impl Image {
     }
 
     pub fn load_cursor_resource(id: int) -> Option<Image> {
-        let null_instance = Instance { instance: ptr::mut_null() };
-        Image::load_resource(null_instance, id, IMAGE_CURSOR, 0, 0)
+        let null_instance = Instance { instance: ptr::null_mut() };
+        Image::load_resource(null_instance, id, ImageType::IMAGE_CURSOR, 0, 0)
     }
 }
 
@@ -68,15 +70,15 @@ pub enum MenuResource {
 impl MenuResource {
     pub fn with_menu_p<T>(&self, f: |*const u16| -> T) -> T {
         match *self {
-            MenuName(ref s) => {
+            MenuResource::MenuName(ref s) => {
                 let u = s.as_slice().to_c_u16();
                 f(u.as_ptr())
             }
-            MenuId(id) => unsafe { f(std::mem::transmute(id)) },
+            MenuResource::MenuId(id) => unsafe { f(std::mem::transmute(id)) },
         }
     }
 
     pub fn null() -> MenuResource {
-        MenuId(0)
+        MenuResource::MenuId(0)
     }
 }
