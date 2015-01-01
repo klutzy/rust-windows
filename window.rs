@@ -1,11 +1,11 @@
 use std::ptr;
-use std::owned::Box;
 use std;
 use std::cell::RefCell;
-
+use std::rc::Rc;
 use std::collections::HashMap;
 
 use libc::{c_int, c_void};
+
 use ll::all::{WNDCLASSEX, CREATESTRUCT};
 use ll::types::{HWND, INT, RECT, LPARAM, UINT, WPARAM, LRESULT, HMENU, HBRUSH};
 
@@ -105,7 +105,7 @@ pub struct WindowParams {
     pub ex_style: u32,
 }
 
-#[deriving(PartialEq, Eq, Hash)]
+#[deriving(PartialEq, Eq, Hash, Copy)]
 pub struct Window {
     pub wnd: HWND,
 }
@@ -121,14 +121,14 @@ impl Clone for Window {
 impl Window {
     pub fn null() -> Window {
         Window {
-            wnd: ptr::mut_null(),
+            wnd: ptr::null_mut(),
         }
     }
 
     pub fn new(
-        instance: Instance, wproc: Option<Box<WindowImpl + Send>>, classname: &str, params: &WindowParams
+        instance: Instance, wproc: Option<Box<WindowImpl + 'static>>, classname: &str, params: &WindowParams
     ) -> Option<Window> {
-        key_init_wnd.replace(wproc);
+        KEY_INIT_WND.with(move |f| *f.borrow_mut() = wproc);
 
         let wnd = unsafe {
             let clsname_u = classname.to_c_u16();
@@ -138,12 +138,12 @@ impl Window {
                 params.x as c_int, params.y as c_int,
                 params.width as c_int, params.height as c_int,
                 params.parent.wnd, params.menu, instance.instance,
-                ptr::mut_null()
+                ptr::null_mut()
             );
             wnd
         };
 
-        if wnd != ptr::mut_null() {
+        if wnd != ptr::null_mut() {
             Some(Window { wnd: wnd })
         } else {
             None
@@ -184,7 +184,7 @@ impl Window {
         // TODO: hwndInsertAfter
         unsafe {
             super::ll::all::SetWindowPos(
-                self.wnd, ptr::mut_null(), x as c_int, y as c_int,
+                self.wnd, ptr::null_mut(), x as c_int, y as c_int,
                 width as c_int, height as c_int, flags
             ) != 0
         }
@@ -211,36 +211,51 @@ pub trait WindowImpl {
     fn wnd_proc(&self, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT;
 }
 
-local_data_key!(pub key_win_map: RefCell<HashMap<Window, Box<WindowImpl+Send>>>)
-local_data_key!(pub key_init_wnd: Box<WindowImpl+Send>)
+/// A thread-local global map from windows to the above WindowImpl trait object
+/// RefCell is necessary for mutability.
+/// Rc is necessary so multiple main_wnd_procs on the same stack can reference it at once.
+/// Box is necessary because WindowImpl is unsized, so can't be Rc'ed directly.
+thread_local!(static KEY_WIN_MAP: RefCell<HashMap<Window, Rc<Box<WindowImpl + 'static>>>> = RefCell::new(HashMap::new()));
 
-pub fn init_window_map() {
-    let win_map = HashMap::new();
-    let _old_map = key_win_map.replace(Some(RefCell::new(win_map)));
-    debug_assert!(_old_map.is_none());
+/// A thread-local global pointing to the initial window
+thread_local!(static KEY_INIT_WND: RefCell<Option<Box<WindowImpl + 'static>>> = RefCell::new(None));
+
+fn associate_window_impl(win: Window, wnd_impl: Box<WindowImpl + 'static>) {
+    KEY_WIN_MAP.with(move |wmap_cell| {
+        let mut wmap = wmap_cell.borrow_mut();
+        wmap.insert(win, Rc::new(wnd_impl));
+    });
+}
+
+fn promote_init_wnd(win: Window) {
+    KEY_INIT_WND.with(move |maybe_initial_cell| {
+        let mut maybe_initial = maybe_initial_cell.borrow_mut();
+        if let Some(mut wnd_impl) = maybe_initial.take() {
+            wnd_impl.wnd_mut().wnd = win.wnd;
+            associate_window_impl(win, wnd_impl);
+        }
+    });
+}
+
+fn lookup_wnd_impl(wnd: HWND) -> Option<Rc<Box<WindowImpl + 'static>>> {
+    KEY_WIN_MAP.with(|wmap_cell| {
+        if let Some(wnd_impl) = wmap_cell.borrow().get(&Window{wnd: wnd}) {
+            return Some(wnd_impl.clone());
+        }
+        return None;
+    })
 }
 
 pub extern "system" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    debug!("main_wnd_proc: wnd {:?} / msg 0x{:x} / w {:?} / l {:?}", wnd, msg as uint, w, l);
-    let win = Window { wnd: wnd };
-    let null_proc = key_init_wnd.replace(None);
-    match null_proc {
-        Some(mut nproc) => {
-            // hello newcomer.
-            nproc.wnd_mut().wnd = wnd;
-            let wmap = key_win_map.get().expect("key_win_map null");
-            (*wmap).borrow_mut().insert(win, nproc);
-        },
-        None => {}
-    };
+    promote_init_wnd(Window { wnd: wnd });
 
-    let wmap = key_win_map.get().expect("key_win_map null");
-    let wmap = wmap.borrow();
-    let wproc = {
-        wmap.find(&win).unwrap()
-    };
-    wproc.wnd_proc(msg, w, l)
+    if let Some(wnd_impl) = lookup_wnd_impl(wnd) {
+        wnd_impl.wnd_proc(msg, w, l)
+    } else {
+        super::def_window_proc(wnd, msg, w, l)
+    }
 }
+
 
 pub trait OnCreate {
     fn on_create(&self, _cs: &CREATESTRUCT) -> bool {

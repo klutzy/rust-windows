@@ -45,7 +45,7 @@ macro_rules! wnd_proc_thunk(
             return 0 as ::windows::ll::types::LRESULT;
         }
     );
-)
+);
 
 #[macro_export]
 macro_rules! wnd_proc(
@@ -63,11 +63,11 @@ macro_rules! wnd_proc(
         fn wnd_proc(&self, msg: ::windows::ll::types::UINT, w: ::windows::ll::types::WPARAM,
                     l: ::windows::ll::types::LPARAM) -> ::windows::ll::types::LRESULT {
             $(
-                wnd_proc_thunk!(self, msg, w, l, $msg)
+                wnd_proc_thunk!(self, msg, w, l, $msg);
             )+
             ::windows::def_window_proc(self.wnd().wnd, msg, w, l)
         }
     }
 
     )
-)
+);

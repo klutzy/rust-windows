@@ -11,6 +11,8 @@
 // FIXME: a lot of types are also defined in liblibc.
 // Here we only re-export c types and redefine windows-specific types.
 
+#![allow(non_snake_case)]
+
 pub use libc::types::os::arch::c95::{c_int, c_uint, c_long, c_ulong, c_short, c_ushort,
                                      c_float, c_double, c_char, c_uchar, c_schar, wchar_t};
 pub use libc::types::os::arch::c99::{c_longlong, c_ulonglong};
@@ -208,7 +210,8 @@ pub type SC_LOCK = LPVOID;
 pub type SERVICE_STATUS_HANDLE = HANDLE;
 
 // winternl.h
-#[allow(uppercase_variables)]
+#[deriving(Copy)]
+#[repr(C)]
 pub struct UNICODE_STRING {
     pub Length: USHORT,
     pub MaximumLength: USHORT,
@@ -222,6 +225,8 @@ pub type QWORD = u64; // unsigned __int64
 
 // additional types used in common now
 
+#[deriving(Copy)]
+#[repr(C)]
 pub struct RECT {
     pub left: LONG,
     pub top: LONG,

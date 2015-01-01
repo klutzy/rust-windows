@@ -4,14 +4,11 @@
 extern crate log;
 
 #[phase(plugin, link)]
-extern crate windows = "rust-windows";
-
-extern crate debug;
+extern crate "rust-windows" as windows;
 
 use std::ptr;
 use std::cell::RefCell;
 use std::default::Default;
-use std::owned::Box;
 
 use windows::main_window_loop;
 use windows::ll::types::{UINT, HBRUSH};
@@ -39,7 +36,7 @@ struct MainFrame {
     font: RefCell<Option<Font>>,
 }
 
-wnd_proc!(MainFrame, win, WM_CREATE, WM_DESTROY, WM_SIZE, WM_SETFOCUS, WM_PAINT)
+wnd_proc!(MainFrame, win, WM_CREATE, WM_DESTROY, WM_SIZE, WM_SETFOCUS, WM_PAINT);
 
 impl OnCreate for MainFrame {
     fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
@@ -53,7 +50,7 @@ impl OnCreate for MainFrame {
             width: rect.right as int,
             height: rect.bottom as int - self.text_height,
             parent: self.win,
-            menu: ptr::mut_null(),
+            menu: ptr::null_mut(),
             ex_style: 0,
         };
         let edit = Window::new(Instance::main_instance(), None, "EDIT", &params);
@@ -62,7 +59,6 @@ impl OnCreate for MainFrame {
             Some(e) => {
                 let font_attr = Default::default();
                 let font = font::Font::new(&font_attr);
-                debug!("font: {:?}", font);
                 match font {
                     None => false,
                     Some(f) => {
@@ -108,7 +104,7 @@ impl OnFocus for MainFrame {
 
 impl MainFrame {
     fn new(instance: Instance, title: String, text_height: int) -> Option<Window> {
-        let icon = Image::load_resource(instance, IDI_ICON, IMAGE_ICON, 0, 0);
+        let icon = Image::load_resource(instance, IDI_ICON, ImageType::IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
             classname: "MainFrame".to_string(),
             style: 0x0001 | 0x0002, // CS_HREDRAW | CS_VREDRAW
@@ -116,7 +112,7 @@ impl MainFrame {
             icon_small: None,
             cursor: Image::load_cursor_resource(32514), // hourglass
             background: (5i + 1) as HBRUSH,
-            menu: MenuId(MENU_MAIN),
+            menu: MenuResource::MenuId(MENU_MAIN),
             cls_extra: 0,
             wnd_extra: 0,
         };
@@ -141,18 +137,16 @@ impl MainFrame {
             width: 400,
             height: 400,
             parent: Window::null(),
-            menu: ptr::mut_null(),
+            menu: ptr::null_mut(),
             ex_style: 0,
         };
 
-        Window::new(instance, Some(wproc as Box<WindowImpl+Send>),
+        Window::new(instance, Some(wproc as Box<WindowImpl + 'static>),
                     wnd_class.classname.as_slice(), &win_params)
     }
 }
 
 fn main() {
-    window::init_window_map();
-
     let instance = Instance::main_instance();
     let main = MainFrame::new(instance, "Hello Rust".to_string(), 20);
     let main = main.unwrap();

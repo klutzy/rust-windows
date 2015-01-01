@@ -8,6 +8,7 @@ use ll::types::{DWORD, HFONT};
 use ll::gdi;
 use wchar::ToCU16Str;
 
+#[deriving(Copy)]
 pub enum CharSet {
     ANSI_CHARSET = 0,
     DEFAULT_CHARSET = 1,
@@ -31,6 +32,7 @@ pub enum CharSet {
     MAC_CHARSET = 77,
 }
 
+#[deriving(Copy)]
 pub enum OutputPrecision {
     OUT_DEFAULT_PRECIS = 0,
     OUT_STRING_PRECIS = 1,
@@ -44,6 +46,7 @@ pub enum OutputPrecision {
     OUT_PS_ONLY_PRECIS = 10,
 }
 
+#[deriving(Copy)]
 pub enum ClipPrecision {
     CLIP_DEFAULT_PRECIS = 0,
     CLIP_CHARACTER_PRECIS = 1,
@@ -57,6 +60,7 @@ pub enum ClipPrecision {
     // CLIP_DFA_OVERRIDE
 }
 
+#[deriving(Copy)]
 pub enum Quality {
     DEFAULT_QUALITY = 0,
     DRAFT_QUALITY = 1,
@@ -67,12 +71,14 @@ pub enum Quality {
     CLEARTYPE_QUALITY = 5,
 }
 
+#[deriving(Copy)]
 pub enum Pitch {
     DEFAULT_PITCH = 0,
     FIXED_PITCH = 1,
     VARIABLE_PITCH = 2,
 }
 
+#[deriving(Copy)]
 pub enum Family {
     FF_DECORATIVE = 80,
     FF_DONTCARE = 0,
@@ -111,17 +117,18 @@ impl Default for FontAttr {
             italic: false,
             underline: false,
             strike_out: false,
-            char_set: DEFAULT_CHARSET,
-            output_precision: OUT_DEFAULT_PRECIS,
-            clip_precision: CLIP_DEFAULT_PRECIS,
-            quality: DEFAULT_QUALITY,
-            pitch: DEFAULT_PITCH,
-            family: FF_DONTCARE,
+            char_set: CharSet::DEFAULT_CHARSET,
+            output_precision: OutputPrecision::OUT_DEFAULT_PRECIS,
+            clip_precision: ClipPrecision::CLIP_DEFAULT_PRECIS,
+            quality: Quality::DEFAULT_QUALITY,
+            pitch: Pitch::DEFAULT_PITCH,
+            family: Family::FF_DONTCARE,
             face: None,
         }
     }
 }
 
+#[deriving(Copy)]
 pub struct Font {
     pub font: HFONT,
 }
@@ -152,10 +159,10 @@ impl Font {
                 attr.clip_precision as DWORD,
                 attr.quality as DWORD,
                 (attr.pitch as DWORD) | (attr.family as DWORD),
-                face.as_ptr()
+                if face.len()==0 { ptr::null_mut() } else { face.as_ptr() },
             )
         };
-        if hfont == ptr::mut_null() {
+        if hfont == ptr::null_mut() {
             None
         }
         else {
