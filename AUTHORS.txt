@@ -1,0 +1,7 @@
+﻿Rust-Windows was written by these people:
+
+klutzy <https://github.com/klutzy>
+Gigih Aji Ibrahim <https://github.com/bungcip>
+Pål-Kristian Engstad <https://github.com/engstad>
+Kang Seonghoon <https://github.com/lifthrasiir>
+Peter Reid <https://github.com/PeterReid>
