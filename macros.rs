@@ -54,6 +54,47 @@ macro_rules! wnd_proc_thunk(
             return 0 as ::windows::ll::types::LRESULT;
         }
     );
+    ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_LBUTTONDOWN) => (
+        if $msg == 0x0201 { // WM_LBUTTONDOWN
+            let l = $l as u32;
+            let x = (l & 0xFFFF) as int;
+            let y = (l >> 16) as int;
+            let flags = $w as u32;
+            $self_.on_left_button_down(x, y, flags);
+            return 0 as ::windows::ll::types::LRESULT;
+        }
+    );
+    ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_LBUTTONUP) => (
+        if $msg == 0x0202 { // WM_LBUTTONUP
+            let l = $l as u32;
+            let x = (l & 0xFFFF) as int;
+            let y = (l >> 16) as int;
+            let flags = $w as u32;
+            $self_.on_left_button_up(x, y, flags);
+            return 0 as ::windows::ll::types::LRESULT;
+        }
+    );
+    ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_KEYDOWN) => (
+        if $msg == 0x0100 { // WM_KEYDOWN
+            return $self_.on_key_down($w as u8, $l as u32) as ::windows::ll::types::LRESULT;
+        }
+    );
+    ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_KEYUP) => (
+        if $msg == 0x0101 { // WM_KEYUP
+            return $self_.on_key_up($w as u8, $l as u32) as ::windows::ll::types::LRESULT;
+        }
+    );
+    ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_ERASEBKGND) => (
+        if $msg == 0x0014 { // WM_ERASEBKGND
+            // Returning 1 means that the background no longer needs erasing.
+            return $self_.on_erase_background() as ::windows::ll::types::LRESULT;
+        }
+    );
+    ($self_:ident, $msg:ident, $w:ident, $l:ident, ANY) => (
+        if let Some(result) = $self_.on_message($msg, $w, $l) {
+            return result;
+        }
+    );
 );
 
 #[macro_export]

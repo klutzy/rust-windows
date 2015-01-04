@@ -11,7 +11,7 @@ use std::ptr;
 
 use libc::c_int;
 use ll::all::PAINTSTRUCT;
-use ll::types::{HDC, HWND, RECT, HBITMAP, HANDLE, BOOL, DWORD, LONG, BYTE, HGDIOBJ};
+use ll::types::{HDC, HWND, RECT, HBITMAP, HANDLE, BOOL, DWORD, LONG, BYTE, HGDIOBJ, COLORREF, HBRUSH};
 use ll::gdi;
 use font::Font;
 use window::WindowImpl;
@@ -50,6 +50,14 @@ impl Dc {
         }
     }
 
+    pub fn set_text_color(&self, color: COLORREF) -> COLORREF {
+        unsafe { gdi::SetTextColor(self.raw, color) }
+    }
+
+    pub fn set_background_color(&self, color: COLORREF) -> COLORREF {
+        unsafe { gdi::SetBkColor(self.raw, color) }
+    }
+
     pub fn create_compatible_bitmap(&self, width: int, height: int) -> Bitmap {
         let raw = unsafe {
             gdi::CreateCompatibleBitmap(self.raw, width as c_int, height as c_int)
@@ -68,6 +76,29 @@ impl Dc {
         };
         return res != 0;
     }
+
+    pub fn fill_rect(&self, left_top: (int, int), right_bottom: (int, int), brush: HBRUSH) -> bool {
+        let (left, top) = left_top;
+        let (right, bottom) = right_bottom;
+        let rect = RECT {
+            left: left as LONG, top: top as LONG,
+            right: right as LONG, bottom: bottom as LONG
+        };
+        let res = unsafe {
+            gdi::FillRect(self.raw, &rect, brush)
+        };
+        return res != 0;
+    }
+
+    pub fn rect(&self, left_top: (int, int), right_bottom: (int, int)) -> bool {
+        let (left, top) = left_top;
+        let (right, bottom) = right_bottom;
+        let res = unsafe {
+            gdi::Rectangle(self.raw, left as c_int, top as c_int, right as c_int, bottom as c_int)
+        };
+        return res != 0;
+    }
+
 }
 
 pub struct PaintDc {

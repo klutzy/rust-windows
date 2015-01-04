@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use libc::{c_int, c_void};
 
 use ll::all::{WNDCLASSEX, CREATESTRUCT};
-use ll::types::{HWND, INT, RECT, LPARAM, UINT, WPARAM, LRESULT, HMENU, HBRUSH};
+use ll::types::{HWND, INT, RECT, LPARAM, UINT, WPARAM, LRESULT, HMENU, HBRUSH, BOOL};
 
 use wchar::ToCU16Str;
 use instance::Instance;
@@ -119,6 +119,10 @@ pub struct Window {
     pub wnd: HWND,
 }
 
+// Sending across threads allows, for example, a worker thread to communicate
+// with a UI thread via PostMessage.
+unsafe impl Send for Window {}
+
 impl Clone for Window {
     fn clone(&self) -> Window {
         Window {
@@ -212,6 +216,24 @@ impl Window {
             super::ll::all::SendMessageW(self.wnd, msg, wparam, lparam)
         }
     }
+
+    pub fn post_message(&self, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> bool {
+        1 == unsafe {
+            super::ll::all::PostMessageW(self.wnd, msg, wparam, lparam)
+        }
+    }
+
+    pub fn invalidate_rect(&self, rect: RECT, erase: bool) -> bool {
+        1 == unsafe {
+            super::ll::all::InvalidateRect(self.wnd, &rect, erase as BOOL)
+        }
+    }
+
+    pub fn invalidate(&self, erase: bool) -> bool {
+        1 == unsafe {
+            super::ll::all::InvalidateRect(self.wnd, ptr::null(), erase as BOOL)
+        }
+    }
 }
 
 pub trait WindowImpl {
@@ -292,5 +314,39 @@ pub trait OnSize {
 
 pub trait OnFocus {
     fn on_focus(&self, _prev: Window) {
+    }
+}
+
+pub trait OnLeftButtonDown {
+    fn on_left_button_down(&self, _x: int, _y: int, _flags: u32) {
+    }
+}
+
+pub trait OnLeftButtonUp {
+    fn on_left_button_up(&self, _x: int, _y: int, _flags: u32) {
+    }
+}
+
+pub trait OnKeyDown {
+    fn on_key_down(&self, _keycode: u8, _flags: u32) -> bool {
+        return false;
+    }
+}
+
+pub trait OnKeyUp {
+    fn on_key_up(&self, _keycode: u8, _flags: u32) -> bool {
+        return false;
+    }
+}
+
+pub trait OnEraseBackground {
+    fn on_erase_background(&self) -> bool {
+        false
+    }
+}
+
+pub trait OnMessage {
+    fn on_message(&self, _message: UINT, _wparam: WPARAM, _lparam: LPARAM) -> Option<LRESULT> {
+        None
     }
 }
