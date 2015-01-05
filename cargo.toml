@@ -9,7 +9,3 @@ authors = [
 	"Kang Seonghoon <https://github.com/lifthrasiir>", 
 	"Peter Reid <https://github.com/PeterReid>"
 ]
-
-[lib]
-name = "windows"
-path = "./lib.rs"

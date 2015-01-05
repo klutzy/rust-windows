@@ -10,9 +10,5 @@ authors = [
 	"Peter Reid <https://github.com/PeterReid>"
 ]
 
-[[bin]]
-name = "example"
-path = "./hello.rs"
-
 [dependencies.windows]
 path = "../"
