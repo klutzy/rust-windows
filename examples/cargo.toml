@@ -1,0 +1,14 @@
+[package]
+
+name = "example"
+version = "0.0.1"
+authors = [
+	"klutzy <https://github.com/klutzy>", 
+	"Gigih Aji Ibrahim <https://github.com/bungcip>", 
+	"Pål-Kristian Engstad <https://github.com/engstad>", 
+	"Kang Seonghoon <https://github.com/lifthrasiir>", 
+	"Peter Reid <https://github.com/PeterReid>"
+]
+
+[dependencies.windows]
+path = "../"

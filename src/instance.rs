@@ -11,7 +11,7 @@ use std::ptr;
 
 use ll::types::HINSTANCE;
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Instance {
     pub instance: HINSTANCE
 }

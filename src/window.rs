@@ -114,7 +114,7 @@ pub struct WindowParams {
     pub ex_style: u32,
 }
 
-#[deriving(PartialEq, Eq, Hash, Copy)]
+#[derive(PartialEq, Eq, Hash, Copy)]
 pub struct Window {
     pub wnd: HWND,
 }

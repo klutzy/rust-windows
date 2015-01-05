@@ -13,7 +13,7 @@
 extern crate log;
 
 #[phase(plugin, link)]
-extern crate "rust-windows" as windows;
+extern crate windows;
 
 use std::ptr;
 use std::cell::RefCell;
