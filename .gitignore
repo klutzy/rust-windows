@@ -1,6 +1,7 @@
-/.cargo/config
-/Cargo.lock
+/cargo.lock
+/examples/cargo.lock
 /target
+/examples/target
 
 *.exe
 *.dll

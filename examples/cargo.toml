@@ -1,6 +1,6 @@
 [package]
 
-name = "windows"
+name = "example"
 version = "0.0.1"
 authors = [
 	"klutzy <https://github.com/klutzy>", 
@@ -10,6 +10,9 @@ authors = [
 	"Peter Reid <https://github.com/PeterReid>"
 ]
 
-[lib]
-name = "windows"
-path = "./lib.rs"
+[[bin]]
+name = "example"
+path = "./hello.rs"
+
+[dependencies.windows]
+path = "../"
