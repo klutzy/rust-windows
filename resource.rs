@@ -31,14 +31,14 @@ impl<T: ToHandle> ToHandle for Option<T> {
 }
 
 #[allow(non_camel_case_types)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum ImageType {
     IMAGE_BITMAP = 0,
     IMAGE_ICON = 1,
     IMAGE_CURSOR = 2,
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Image {
     pub image: HANDLE,
 }

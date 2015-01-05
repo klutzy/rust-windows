@@ -1,3 +1,7 @@
+/.cargo/config
+/Cargo.lock
+/target
+
 *.exe
 *.dll
 *.rlib

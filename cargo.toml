@@ -1,0 +1,9 @@
+[package]
+
+name = "rust-windows"
+version = "0.0.1"
+authors = ["Josiah Bills <Josiah@adoniram.net>"]
+
+[lib]
+name = "rust-windows"
+path = "./lib.rs"

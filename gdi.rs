@@ -16,7 +16,7 @@ use ll::gdi;
 use font::Font;
 use window::WindowImpl;
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Dc {
     pub raw: HDC,
 }
@@ -118,7 +118,7 @@ impl PaintDc {
             },
             fRestore: 0 as BOOL,
             fIncUpdate: 0 as BOOL,
-            rgbReserved: [0 as BYTE, ..32],
+            rgbReserved: [0 as BYTE; 32],
         };
 
         let wnd = w.wnd().wnd;
