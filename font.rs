@@ -17,7 +17,7 @@ use ll::types::{DWORD, HFONT};
 use ll::gdi;
 use wchar::ToCU16Str;
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum CharSet {
     ANSI_CHARSET = 0,
     DEFAULT_CHARSET = 1,
@@ -41,7 +41,7 @@ pub enum CharSet {
     MAC_CHARSET = 77,
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum OutputPrecision {
     OUT_DEFAULT_PRECIS = 0,
     OUT_STRING_PRECIS = 1,
@@ -55,7 +55,7 @@ pub enum OutputPrecision {
     OUT_PS_ONLY_PRECIS = 10,
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum ClipPrecision {
     CLIP_DEFAULT_PRECIS = 0,
     CLIP_CHARACTER_PRECIS = 1,
@@ -69,7 +69,7 @@ pub enum ClipPrecision {
     // CLIP_DFA_OVERRIDE
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum Quality {
     DEFAULT_QUALITY = 0,
     DRAFT_QUALITY = 1,
@@ -80,14 +80,14 @@ pub enum Quality {
     CLEARTYPE_QUALITY = 5,
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum Pitch {
     DEFAULT_PITCH = 0,
     FIXED_PITCH = 1,
     VARIABLE_PITCH = 2,
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum Family {
     FF_DECORATIVE = 80,
     FF_DONTCARE = 0,
@@ -137,7 +137,7 @@ impl Default for FontAttr {
     }
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Font {
     pub font: HFONT,
 }

@@ -16,7 +16,7 @@ use ll::gdi;
 use font::Font;
 use window::WindowImpl;
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Dc {
     pub raw: HDC,
 }
