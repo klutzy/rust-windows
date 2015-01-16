@@ -66,7 +66,8 @@ impl fmt::Show for CU16String {
 
 /// Parses a C utf-16 "multistring".
 /// See `std::c_str::from_c_multistring` for detailed explanation.
-pub unsafe fn from_c_u16_multistring(buf: *const u16, count: Option<uint>, f: |&[u16]|) -> uint {
+pub unsafe fn from_c_u16_multistring<F>(buf: *const u16, count: Option<uint>, f: F) -> uint 
+    where F: Fn(&[u16]) {
     let mut curr_ptr: uint = buf as uint;
     let mut ctr = 0;
     let (limited_count, limit) = match count {

@@ -77,7 +77,8 @@ pub enum MenuResource {
 }
 
 impl MenuResource {
-    pub fn with_menu_p<T>(&self, f: |*const u16| -> T) -> T {
+    pub fn with_menu_p<T, F>(&self, f: F) -> T 
+        where F: FnOnce(*const u16) -> T {
         match *self {
             MenuResource::MenuName(ref s) => {
                 let u = s.as_slice().to_c_u16();
