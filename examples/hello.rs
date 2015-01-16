@@ -120,7 +120,7 @@ impl MainFrame {
             icon: icon,
             icon_small: None,
             cursor: Image::load_cursor_resource(32514), // hourglass
-            background: (5i + 1) as HBRUSH,
+            background: (5 + 1) as HBRUSH,
             menu: MenuResource::MenuId(MENU_MAIN),
             cls_extra: 0,
             wnd_extra: 0,
