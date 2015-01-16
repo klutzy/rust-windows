@@ -7,12 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(globs, macro_rules, phase)]
 
-#[phase(plugin, link)]
+#[macro_use]
 extern crate log;
 
-#[phase(plugin, link)]
+#[macro_use]
 extern crate "rust-windows" as windows;
 
 use std::ptr;
