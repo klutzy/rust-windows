@@ -129,13 +129,13 @@ impl MainFrame {
             return None;
         }
 
-        let wproc = box MainFrame {
+        let wproc = Box::new(MainFrame {
             win: Window::null(),
             title: title.clone(),
             text_height: text_height,
             edit: RefCell::new(None),
             font: RefCell::new(None),
-        };
+        });
 
         let win_params = WindowParams {
             window_name: title,
