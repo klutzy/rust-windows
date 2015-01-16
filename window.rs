@@ -24,14 +24,14 @@ use resource::*;
 
 pub struct WndClass {
     pub classname: String,
-    pub style: uint,
+    pub style: usize,
     pub icon: Option<Image>,
     pub icon_small: Option<Image>,
     pub cursor: Option<Image>,
     pub background: HBRUSH,
     pub menu: MenuResource,
-    pub cls_extra: int,
-    pub wnd_extra: int,
+    pub cls_extra: isize,
+    pub wnd_extra: isize,
 }
 
 impl WndClass {
@@ -105,10 +105,10 @@ pub static ES_WANTRETURN: u32 = 4096;
 pub struct WindowParams {
     pub window_name: String,
     pub style: u32,
-    pub x: int,
-    pub y: int,
-    pub width: int,
-    pub height: int,
+    pub x: isize,
+    pub y: isize,
+    pub width: isize,
+    pub height: isize,
     pub parent: Window,
     pub menu: HMENU,
     pub ex_style: u32,
@@ -163,11 +163,11 @@ impl Window {
         }
     }
 
-    pub fn show(&self, cmd_show: int) -> bool {
+    pub fn show(&self, cmd_show: isize) -> bool {
         unsafe { super::ll::all::ShowWindow(self.wnd, cmd_show as c_int) == 0 }
     }
 
-    pub fn show_async(&self, cmd_show: int) -> bool {
+    pub fn show_async(&self, cmd_show: isize) -> bool {
         unsafe { super::ll::all::ShowWindowAsync(self.wnd, cmd_show as c_int) == 0 }
     }
 
@@ -192,7 +192,7 @@ impl Window {
     }
 
     pub fn set_window_pos(
-        &self, x: int, y: int, width: int, height: int, flags: UINT
+        &self, x: isize, y: isize, width: isize, height: isize, flags: UINT
     ) -> bool {
         // TODO: hwndInsertAfter
         unsafe {
@@ -308,7 +308,7 @@ pub trait OnPaint {
 }
 
 pub trait OnSize {
-    fn on_size(&self, _width: int, _height: int) {
+    fn on_size(&self, _width: isize, _height: isize) {
     }
 }
 
@@ -318,12 +318,12 @@ pub trait OnFocus {
 }
 
 pub trait OnLeftButtonDown {
-    fn on_left_button_down(&self, _x: int, _y: int, _flags: u32) {
+    fn on_left_button_down(&self, _x: isize, _y: isize, _flags: u32) {
     }
 }
 
 pub trait OnLeftButtonUp {
-    fn on_left_button_up(&self, _x: int, _y: int, _flags: u32) {
+    fn on_left_button_up(&self, _x: isize, _y: isize, _flags: u32) {
     }
 }
 

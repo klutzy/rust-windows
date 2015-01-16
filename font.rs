@@ -98,11 +98,11 @@ pub enum Family {
 }
 
 pub struct FontAttr {
-    pub height: int,
-    pub width: int,
-    pub escapement: int,
-    pub orientation: int,
-    pub weight: int,
+    pub height: isize,
+    pub width: isize,
+    pub escapement: isize,
+    pub orientation: isize,
+    pub weight: isize,
     pub italic: bool,
     pub underline: bool,
     pub strike_out: bool,

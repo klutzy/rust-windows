@@ -41,7 +41,7 @@ pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
     unsafe { ll::all::DefWindowProcW(hwnd, msg, w, l) }
 }
 
-pub fn main_window_loop() -> uint {
+pub fn main_window_loop() -> usize {
     let msg = MSG {
         hwnd: ptr::null_mut(),
         message: 0 as UINT,
@@ -58,7 +58,7 @@ pub fn main_window_loop() -> uint {
 
         if ret == 0 {
             let exit_code = msg.wParam;
-            return exit_code as uint;
+            return exit_code as usize;
         }
         else {
             unsafe {

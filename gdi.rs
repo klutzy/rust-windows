@@ -26,7 +26,7 @@ impl Dc {
         self.raw
     }
 
-    pub fn text_out(&self, x: int, y: int, s: &str) -> bool {
+    pub fn text_out(&self, x: isize, y: isize, s: &str) -> bool {
         let mut s16 : Vec<u16> = s.utf16_units().collect();
         let len = s16.len();
 
@@ -58,15 +58,15 @@ impl Dc {
         unsafe { gdi::SetBkColor(self.raw, color) }
     }
 
-    pub fn create_compatible_bitmap(&self, width: int, height: int) -> Bitmap {
+    pub fn create_compatible_bitmap(&self, width: isize, height: isize) -> Bitmap {
         let raw = unsafe {
             gdi::CreateCompatibleBitmap(self.raw, width as c_int, height as c_int)
         };
         Bitmap { raw: raw }
     }
 
-    pub fn bit_blt(&self, pos: (int, int), size: (int, int), src: &Dc,
-                   src_pos: (int, int), flag: DWORD) -> bool {
+    pub fn bit_blt(&self, pos: (isize, isize), size: (isize, isize), src: &Dc,
+                   src_pos: (isize, isize), flag: DWORD) -> bool {
         let res = unsafe {
             let (px, py) = pos;
             let (w, h) = size;
@@ -77,7 +77,7 @@ impl Dc {
         return res != 0;
     }
 
-    pub fn fill_rect(&self, left_top: (int, int), right_bottom: (int, int), brush: HBRUSH) -> bool {
+    pub fn fill_rect(&self, left_top: (isize, isize), right_bottom: (isize, isize), brush: HBRUSH) -> bool {
         let (left, top) = left_top;
         let (right, bottom) = right_bottom;
         let rect = RECT {
@@ -90,7 +90,7 @@ impl Dc {
         return res != 0;
     }
 
-    pub fn rect(&self, left_top: (int, int), right_bottom: (int, int)) -> bool {
+    pub fn rect(&self, left_top: (isize, isize), right_bottom: (isize, isize)) -> bool {
         let (left, top) = left_top;
         let (right, bottom) = right_bottom;
         let res = unsafe {

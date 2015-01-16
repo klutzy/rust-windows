@@ -35,8 +35,8 @@ macro_rules! wnd_proc_thunk(
     ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_SIZE) => (
         if $msg == 0x0005 { // WM_SIZE
             let l = $l as u32;
-            let width = (l & 0xFFFF) as int;
-            let height = (l >> 16) as int;
+            let width = (l & 0xFFFF) as isize;
+            let height = (l >> 16) as isize;
             $self_.on_size(width, height);
             return 0 as ::windows::ll::types::LRESULT;
         }
@@ -57,8 +57,8 @@ macro_rules! wnd_proc_thunk(
     ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_LBUTTONDOWN) => (
         if $msg == 0x0201 { // WM_LBUTTONDOWN
             let l = $l as u32;
-            let x = (l & 0xFFFF) as int;
-            let y = (l >> 16) as int;
+            let x = (l & 0xFFFF) as isize;
+            let y = (l >> 16) as isize;
             let flags = $w as u32;
             $self_.on_left_button_down(x, y, flags);
             return 0 as ::windows::ll::types::LRESULT;
@@ -67,8 +67,8 @@ macro_rules! wnd_proc_thunk(
     ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_LBUTTONUP) => (
         if $msg == 0x0202 { // WM_LBUTTONUP
             let l = $l as u32;
-            let x = (l & 0xFFFF) as int;
-            let y = (l >> 16) as int;
+            let x = (l & 0xFFFF) as isize;
+            let y = (l >> 16) as isize;
             let flags = $w as u32;
             $self_.on_left_button_up(x, y, flags);
             return 0 as ::windows::ll::types::LRESULT;

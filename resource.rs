@@ -44,7 +44,7 @@ pub struct Image {
 }
 
 impl Image {
-    pub fn load_resource(instance: Instance, id: int, img_type: ImageType, width: int, height: int) -> Option<Image> {
+    pub fn load_resource(instance: Instance, id: isize, img_type: ImageType, width: isize, height: isize) -> Option<Image> {
         let img = unsafe {
             super::ll::all::LoadImageW(
                 instance.instance, std::mem::transmute(id), img_type as UINT,
@@ -59,7 +59,7 @@ impl Image {
         }
     }
 
-    pub fn load_cursor_resource(id: int) -> Option<Image> {
+    pub fn load_cursor_resource(id: isize) -> Option<Image> {
         let null_instance = Instance { instance: ptr::null_mut() };
         Image::load_resource(null_instance, id, ImageType::IMAGE_CURSOR, 0, 0)
     }
@@ -73,7 +73,7 @@ impl ToHandle for Image {
 
 pub enum MenuResource {
     MenuName(String),
-    MenuId(int),
+    MenuId(isize),
 }
 
 impl MenuResource {

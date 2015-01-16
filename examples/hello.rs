@@ -31,15 +31,15 @@ use windows::font::Font;
 use windows::font;
 
 // TODO duplicate of hello.rc
-static IDI_ICON: int = 0x101;
-static MENU_MAIN: int = 0x201;
-//static MENU_NEW: int = 0x202;
-//static MENU_EXIT: int = 0x203;
+static IDI_ICON: isize = 0x101;
+static MENU_MAIN: isize = 0x201;
+//static MENU_NEW: isize = 0x202;
+//static MENU_EXIT: isize = 0x203;
 
 struct MainFrame {
     win: Window,
     title: String,
-    text_height: int,
+    text_height: isize,
     edit: RefCell<Option<Window>>,
     font: RefCell<Option<Font>>,
 }
@@ -55,8 +55,8 @@ impl OnCreate for MainFrame {
                 window::ES_AUTOVSCROLL | window::ES_MULTILINE | window::ES_NOHIDESEL,
             x: 0,
             y: self.text_height,
-            width: rect.right as int,
-            height: rect.bottom as int - self.text_height,
+            width: rect.right as isize,
+            height: rect.bottom as isize - self.text_height,
             parent: self.win,
             menu: ptr::null_mut(),
             ex_style: 0,
@@ -85,7 +85,7 @@ impl OnCreate for MainFrame {
 }
 
 impl OnSize for MainFrame {
-    fn on_size(&self, width: int, height: int) {
+    fn on_size(&self, width: isize, height: isize) {
         // SWP_NOOWNERZORDER | SWP_NOZORDER
         let h = self.text_height;
         self.edit.borrow().expect("edit is empty")
@@ -111,7 +111,7 @@ impl OnFocus for MainFrame {
 }
 
 impl MainFrame {
-    fn new(instance: Instance, title: String, text_height: int) -> Option<Window> {
+    fn new(instance: Instance, title: String, text_height: isize) -> Option<Window> {
         let icon = Image::load_resource(instance, IDI_ICON, ImageType::IMAGE_ICON, 0, 0);
         let wnd_class = WndClass {
             classname: "MainFrame".to_string(),
@@ -163,5 +163,5 @@ fn main() {
     main.update();
 
     let exit_code = main_window_loop();
-    std::os::set_exit_status(exit_code as int);
+    std::os::set_exit_status(exit_code as isize);
 }
