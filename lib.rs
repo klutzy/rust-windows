@@ -24,7 +24,7 @@ use ll::types::{HWND, LPARAM, UINT, WPARAM, LRESULT, DWORD};
 
 pub mod ll;
 
-pub mod macros;
+#[macro_use] pub mod macros;
 pub mod instance;
 pub mod resource;
 pub mod font;

@@ -7,8 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![macro_escape]
-
 #[macro_export]
 macro_rules! wnd_proc_thunk(
     ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_CREATE) => (
