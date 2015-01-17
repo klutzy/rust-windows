@@ -7,12 +7,12 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(globs, phase, macro_rules)]
+#![allow(unstable)]
 #![crate_type = "lib"]
 #![crate_type = "dylib"]
 #![crate_name = "rust-windows"]
 
-#[phase(plugin, link)] extern crate log;
+#[macro_use] extern crate log;
 
 extern crate libc;
 extern crate collections;
@@ -25,7 +25,7 @@ use ll::types::{HWND, LPARAM, UINT, WPARAM, LRESULT, DWORD};
 
 pub mod ll;
 
-pub mod macros;
+#[macro_use] pub mod macros;
 pub mod instance;
 pub mod resource;
 pub mod font;
@@ -42,7 +42,7 @@ pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
     unsafe { ll::all::DefWindowProcW(hwnd, msg, w, l) }
 }
 
-pub fn main_window_loop() -> uint {
+pub fn main_window_loop() -> usize {
     let msg = MSG {
         hwnd: ptr::null_mut(),
         message: 0 as UINT,
@@ -59,7 +59,7 @@ pub fn main_window_loop() -> uint {
 
         if ret == 0 {
             let exit_code = msg.wParam;
-            return exit_code as uint;
+            return exit_code as usize;
         }
         else {
             unsafe {

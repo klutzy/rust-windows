@@ -16,7 +16,7 @@ use std::vec::Vec;
 pub struct CU16String {
     buf: *const u16,
     /// length of buffer, including null
-    len: uint,
+    len: usize,
 }
 
 impl CU16String {
@@ -32,7 +32,7 @@ impl CU16String {
                     }
                     length_counter += 1;
                 }
-                length_counter as uint
+                length_counter as usize
             }
         }
     }
@@ -66,8 +66,9 @@ impl fmt::Show for CU16String {
 
 /// Parses a C utf-16 "multistring".
 /// See `std::c_str::from_c_multistring` for detailed explanation.
-pub unsafe fn from_c_u16_multistring(buf: *const u16, count: Option<uint>, f: |&[u16]|) -> uint {
-    let mut curr_ptr: uint = buf as uint;
+pub unsafe fn from_c_u16_multistring<F>(buf: *const u16, count: Option<usize>, f: F) -> usize 
+    where F: Fn(&[u16]) {
+    let mut curr_ptr: usize = buf as usize;
     let mut ctr = 0;
     let (limited_count, limit) = match count {
         Some(limit) => (true, limit),

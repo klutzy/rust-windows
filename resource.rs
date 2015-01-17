@@ -31,20 +31,20 @@ impl<T: ToHandle> ToHandle for Option<T> {
 }
 
 #[allow(non_camel_case_types)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub enum ImageType {
     IMAGE_BITMAP = 0,
     IMAGE_ICON = 1,
     IMAGE_CURSOR = 2,
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Image {
     pub image: HANDLE,
 }
 
 impl Image {
-    pub fn load_resource(instance: Instance, id: int, img_type: ImageType, width: int, height: int) -> Option<Image> {
+    pub fn load_resource(instance: Instance, id: isize, img_type: ImageType, width: isize, height: isize) -> Option<Image> {
         let img = unsafe {
             super::ll::all::LoadImageW(
                 instance.instance, std::mem::transmute(id), img_type as UINT,
@@ -59,7 +59,7 @@ impl Image {
         }
     }
 
-    pub fn load_cursor_resource(id: int) -> Option<Image> {
+    pub fn load_cursor_resource(id: isize) -> Option<Image> {
         let null_instance = Instance { instance: ptr::null_mut() };
         Image::load_resource(null_instance, id, ImageType::IMAGE_CURSOR, 0, 0)
     }
@@ -73,11 +73,12 @@ impl ToHandle for Image {
 
 pub enum MenuResource {
     MenuName(String),
-    MenuId(int),
+    MenuId(isize),
 }
 
 impl MenuResource {
-    pub fn with_menu_p<T>(&self, f: |*const u16| -> T) -> T {
+    pub fn with_menu_p<T, F>(&self, f: F) -> T 
+        where F: FnOnce(*const u16) -> T {
         match *self {
             MenuResource::MenuName(ref s) => {
                 let u = s.as_slice().to_c_u16();

@@ -15,7 +15,7 @@ use ll::types::*;
 pub type WNDPROC = *const c_void;
 
 #[repr(C)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct SECURITY_ATTRIBUTES {
     pub nLength: DWORD,
     pub lpSecurityDescriptor: LPVOID,
@@ -23,7 +23,7 @@ pub struct SECURITY_ATTRIBUTES {
 }
 
 #[repr(C)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct PROCESS_INFORMATION {
     pub hProcess: HANDLE,
     pub hThread: HANDLE,
@@ -32,7 +32,7 @@ pub struct PROCESS_INFORMATION {
 }
 
 #[repr(C)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct STARTUPINFO {
     pub cb: DWORD,
     pub lpReserved: LPWSTR,
@@ -55,7 +55,7 @@ pub struct STARTUPINFO {
 }
 
 #[repr(C)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct WNDCLASSEX {
     pub cbSize: UINT,
     pub style: UINT,
@@ -72,7 +72,7 @@ pub struct WNDCLASSEX {
 }
 
 #[repr(C)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct CREATESTRUCT {
     pub lpCreateParams: LPVOID,
     pub hInstance: HINSTANCE,
@@ -89,14 +89,14 @@ pub struct CREATESTRUCT {
 }
 
 #[repr(C)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct POINT {
     pub x: LONG,
     pub y: LONG,
 }
 
 #[repr(C)]
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct MSG {
     pub hwnd: HWND,
     pub message: UINT,
@@ -106,7 +106,7 @@ pub struct MSG {
     pub pt: POINT,
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 #[repr(C)]
 pub struct PAINTSTRUCT {
     pub hdc: HDC,
@@ -114,7 +114,7 @@ pub struct PAINTSTRUCT {
     pub rcPaint: RECT,
     pub fRestore: BOOL,
     pub fIncUpdate: BOOL,
-    pub rgbReserved: [BYTE, ..32],
+    pub rgbReserved: [BYTE; 32],
 }
 
 // kernel32

@@ -219,7 +219,7 @@ pub type SC_LOCK = LPVOID;
 pub type SERVICE_STATUS_HANDLE = HANDLE;
 
 // winternl.h
-#[deriving(Copy)]
+#[derive(Copy)]
 #[repr(C)]
 pub struct UNICODE_STRING {
     pub Length: USHORT,
@@ -234,7 +234,7 @@ pub type QWORD = u64; // unsigned __int64
 
 // additional types used in common now
 
-#[deriving(Copy)]
+#[derive(Copy)]
 #[repr(C)]
 pub struct RECT {
     pub left: LONG,
