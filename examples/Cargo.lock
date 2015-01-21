@@ -1,0 +1,11 @@
+[root]
+name = "examples"
+version = "0.0.1"
+dependencies = [
+ "rust-windows 0.0.1",
+]
+
+[[package]]
+name = "rust-windows"
+version = "0.0.1"
+

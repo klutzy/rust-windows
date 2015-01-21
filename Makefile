@@ -1,17 +1,17 @@
 RUSTC?=rustc.exe
 RUST_OPTS?=
-SRC=$(wildcard *.rs) $(wildcard ll/*.rs)
+SRC=$(wildcard src/*.rs) $(wildcard src/ll/*.rs)
 
 .PHONY: all
 all: libwindows.dummy
 
 libwindows.dummy: $(SRC)
-	$(RUSTC) lib.rs $(RUST_OPTS)
+	$(RUSTC) src/lib.rs $(RUST_OPTS)
 	touch $@
 
 .PHONY: check
 check: $(SRC)
-	$(RUSTC) --test -o $@ lib.rs
+	$(RUSTC) --test -o $@ src/lib.rs
 	./$@
 
 
