@@ -1,7 +1,7 @@
 RUSTC?=rustc.exe
 RUST_OPTS=
-SRC=hello.rs
-RES=hello.rc
+SRC=src/hello.rs
+RES=src/hello.rc
 EXE=$(patsubst %.rs, %.exe, $(SRC))
 RC=$(patsubst %.rc, %.rc.o, $(RES))
 
