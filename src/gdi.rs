@@ -9,10 +9,13 @@
 
 use std::ptr;
 
-use libc::c_int;
-use ll::all::PAINTSTRUCT;
-use ll::types::{HDC, HWND, RECT, HBITMAP, HANDLE, BOOL, DWORD, LONG, BYTE, HGDIOBJ, COLORREF, HBRUSH};
-use ll::gdi;
+use gdi32;
+use user32;
+use winapi::{
+    BOOL, BYTE, COLORREF, DWORD, HANDLE, HBITMAP, HBRUSH, HDC, HFONT, HGDIOBJ, HWND, LONG,
+    PAINTSTRUCT, RECT, c_int,
+};
+
 use font::Font;
 use window::WindowImpl;
 
@@ -32,35 +35,35 @@ impl Dc {
 
         s16.push(0u16);
         let ret = unsafe {
-            gdi::TextOutW(self.raw, x as c_int, y as c_int, s16.as_mut_ptr(), len as i32)
+            gdi32::TextOutW(self.raw, x as c_int, y as c_int, s16.as_mut_ptr(), len as i32)
         };
         ret != 0
     }
 
     pub fn select_object(&self, handle: HANDLE) -> HANDLE {
-        unsafe { gdi::SelectObject(self.raw, handle as HGDIOBJ) }
+        unsafe { gdi32::SelectObject(self.raw, handle as HGDIOBJ) }
     }
 
     pub fn select_font(&self, font: &Font) -> Option<Font> {
-        let res = self.select_object(font.font);
+        let res = self.select_object(font.font as HANDLE);
         if res.is_null() {
             None
         } else {
-            Some(Font { font: res })
+            Some(Font { font: res as HFONT })
         }
     }
 
     pub fn set_text_color(&self, color: COLORREF) -> COLORREF {
-        unsafe { gdi::SetTextColor(self.raw, color) }
+        unsafe { gdi32::SetTextColor(self.raw, color) }
     }
 
     pub fn set_background_color(&self, color: COLORREF) -> COLORREF {
-        unsafe { gdi::SetBkColor(self.raw, color) }
+        unsafe { gdi32::SetBkColor(self.raw, color) }
     }
 
     pub fn create_compatible_bitmap(&self, width: isize, height: isize) -> Bitmap {
         let raw = unsafe {
-            gdi::CreateCompatibleBitmap(self.raw, width as c_int, height as c_int)
+            gdi32::CreateCompatibleBitmap(self.raw, width as c_int, height as c_int)
         };
         Bitmap { raw: raw }
     }
@@ -71,7 +74,7 @@ impl Dc {
             let (px, py) = pos;
             let (w, h) = size;
             let (sx, sy) = src_pos;
-            gdi::BitBlt(self.raw, px as c_int, py as c_int, w as c_int, h as c_int,
+            gdi32::BitBlt(self.raw, px as c_int, py as c_int, w as c_int, h as c_int,
                         src.raw, sx as c_int, sy as c_int, flag)
         };
         return res != 0;
@@ -85,7 +88,7 @@ impl Dc {
             right: right as LONG, bottom: bottom as LONG
         };
         let res = unsafe {
-            gdi::FillRect(self.raw, &rect, brush)
+            gdi32::FillRect(self.raw, &rect, brush)
         };
         return res != 0;
     }
@@ -94,7 +97,7 @@ impl Dc {
         let (left, top) = left_top;
         let (right, bottom) = right_bottom;
         let res = unsafe {
-            gdi::Rectangle(self.raw, left as c_int, top as c_int, right as c_int, bottom as c_int)
+            gdi32::Rectangle(self.raw, left as c_int, top as c_int, right as c_int, bottom as c_int)
         };
         return res != 0;
     }
@@ -122,7 +125,7 @@ impl PaintDc {
         };
 
         let wnd = w.wnd().wnd;
-        let dc = unsafe { super::ll::all::BeginPaint(wnd, &mut ps) };
+        let dc = unsafe { user32::BeginPaint(wnd, &mut ps) };
         if dc.is_null() {
             return None;
         }
@@ -138,7 +141,7 @@ impl PaintDc {
 
 impl Drop for PaintDc {
     fn drop(&mut self) {
-        unsafe { super::ll::all::EndPaint(self.wnd, &self.ps) };
+        unsafe { user32::EndPaint(self.wnd, &self.ps) };
     }
 }
 
@@ -148,7 +151,7 @@ pub struct MemoryDc {
 
 impl MemoryDc {
     pub fn new(dc: &Dc) -> Option<MemoryDc> {
-        let hdc = unsafe { gdi::CreateCompatibleDC(dc.raw) };
+        let hdc = unsafe { gdi32::CreateCompatibleDC(dc.raw) };
         if hdc.is_null() {
             return None;
         }
@@ -159,7 +162,7 @@ impl MemoryDc {
 
 impl Drop for MemoryDc {
     fn drop(&mut self) {
-        unsafe { gdi::DeleteDC(self.dc.raw) };
+        unsafe { gdi32::DeleteDC(self.dc.raw) };
     }
 }
 
@@ -169,6 +172,6 @@ pub struct Bitmap {
 
 impl Drop for Bitmap {
     fn drop(&mut self) {
-        unsafe { gdi::DeleteObject(self.raw) };
+        unsafe { gdi32::DeleteObject(self.raw as HGDIOBJ) };
     }
 }

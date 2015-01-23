@@ -13,17 +13,14 @@
 #![crate_name = "rust-windows"]
 
 #[macro_use] extern crate log;
-
-extern crate libc;
 extern crate collections;
+extern crate "gdi32-sys" as gdi32;
+extern crate "kernel32-sys" as kernel32;
+extern crate "user32-sys" as user32;
+extern crate winapi;
 
 use std::ptr;
-
-use libc::{LONG};
-use ll::all::{MSG, POINT};
-use ll::types::{HWND, LPARAM, UINT, WPARAM, LRESULT, DWORD};
-
-pub mod ll;
+use winapi::{DWORD, HWND, LONG, LPARAM, LPMSG, LRESULT, MSG, POINT, UINT, WPARAM};
 
 #[macro_use] pub mod macros;
 pub mod instance;
@@ -35,15 +32,15 @@ pub mod gdi;
 pub mod dialog;
 
 pub fn get_last_error() -> DWORD {
-    unsafe { ll::all::GetLastError() }
+    unsafe { kernel32::GetLastError() }
 }
 
 pub fn def_window_proc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    unsafe { ll::all::DefWindowProcW(hwnd, msg, w, l) }
+    unsafe { user32::DefWindowProcW(hwnd, msg, w, l) }
 }
 
 pub fn main_window_loop() -> usize {
-    let msg = MSG {
+    let mut msg = MSG {
         hwnd: ptr::null_mut(),
         message: 0 as UINT,
         wParam: 0 as WPARAM,
@@ -53,7 +50,7 @@ pub fn main_window_loop() -> usize {
     };
     loop {
         let ret = unsafe {
-            ll::all::GetMessageW(&msg as *const MSG, ptr::null_mut(),
+            user32::GetMessageW(&mut msg as LPMSG, ptr::null_mut(),
                     0 as UINT, 0 as UINT)
         };
 
@@ -63,8 +60,8 @@ pub fn main_window_loop() -> usize {
         }
         else {
             unsafe {
-                ll::all::TranslateMessage(&msg as *const MSG);
-                ll::all::DispatchMessageW(&msg as *const MSG);
+                user32::TranslateMessage(&msg as *const MSG);
+                user32::DispatchMessageW(&msg as *const MSG);
             }
         }
     }

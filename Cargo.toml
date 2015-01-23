@@ -11,3 +11,9 @@ tags = []
 
 [lib]
 name = "rust-windows"
+
+[dependencies]
+gdi32-sys = "*"
+kernel32-sys = "*"
+user32-sys = "*"
+winapi = "*"
