@@ -12,9 +12,9 @@
 use std::ptr;
 use std::default::Default;
 
-use libc::c_int;
-use ll::types::{DWORD, HFONT};
-use ll::gdi;
+use gdi32;
+use winapi::{DWORD, HFONT, c_int};
+
 use wchar::ToCU16Str;
 
 #[derive(Copy)]
@@ -154,7 +154,7 @@ impl Font {
     pub fn new(attr: &FontAttr) -> Option<Font> {
         let face = attr.face.to_c_u16();
         let hfont = unsafe {
-            gdi::CreateFontW(
+            gdi32::CreateFontW(
                 attr.height as c_int,
                 attr.width as c_int,
                 attr.escapement as c_int,

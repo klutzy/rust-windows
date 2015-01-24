@@ -9,7 +9,8 @@
 
 use std::ptr;
 
-use ll::types::HINSTANCE;
+use kernel32;
+use winapi::{HINSTANCE};
 
 #[derive(Copy)]
 pub struct Instance {
@@ -19,7 +20,7 @@ pub struct Instance {
 impl Instance {
     pub fn main_instance() -> Instance {
         Instance {
-            instance: unsafe { super::ll::all::GetModuleHandleW(ptr::null()) as HINSTANCE },
+            instance: unsafe { kernel32::GetModuleHandleW(ptr::null()) as HINSTANCE },
         }
     }
 }

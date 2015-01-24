@@ -10,9 +10,8 @@
 use std::ptr;
 use std;
 
-use libc::c_int;
-use libc::HANDLE;
-use ll::types::UINT;
+use user32;
+use winapi::{HANDLE, UINT, c_int};
 
 use wchar::ToCU16Str;
 use instance::Instance;
@@ -46,7 +45,7 @@ pub struct Image {
 impl Image {
     pub fn load_resource(instance: Instance, id: isize, img_type: ImageType, width: isize, height: isize) -> Option<Image> {
         let img = unsafe {
-            super::ll::all::LoadImageW(
+            user32::LoadImageW(
                 instance.instance, std::mem::transmute(id), img_type as UINT,
                 width as c_int, height as c_int, 0x8000
             )

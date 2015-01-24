@@ -13,10 +13,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use libc::{c_int, c_void};
-
-use ll::all::{WNDCLASSEX, CREATESTRUCT};
-use ll::types::{HWND, INT, RECT, LPARAM, UINT, WPARAM, LRESULT, HMENU, HBRUSH, BOOL};
+use user32;
+use winapi::{
+    BOOL, CREATESTRUCTW, HBRUSH, HCURSOR, HICON, HMENU, HWND, INT, LPARAM, LRESULT, RECT, UINT,
+    WNDCLASSEXW, WNDPROC, WPARAM, c_int,
+};
 
 use wchar::ToCU16Str;
 use instance::Instance;
@@ -38,22 +39,22 @@ impl WndClass {
     pub fn register(&self, instance: Instance) -> bool {
         self.menu.with_menu_p(|menu_p| {
             let clsname_u = self.classname.to_c_u16();
-            let wcex = WNDCLASSEX {
-                cbSize: std::mem::size_of::<WNDCLASSEX>() as UINT,
+            let wcex = WNDCLASSEXW {
+                cbSize: std::mem::size_of::<WNDCLASSEXW>() as UINT,
                 style: self.style as UINT,
-                lpfnWndProc: main_wnd_proc as *const c_void,
+                lpfnWndProc: main_wnd_proc as WNDPROC,
                 cbClsExtra: self.cls_extra as INT,
                 cbWndExtra: self.wnd_extra as INT,
                 hInstance: instance.instance,
-                hIcon: self.icon.to_handle(),
-                hCursor: self.cursor.to_handle(),
+                hIcon: self.icon.to_handle() as HICON,
+                hCursor: self.cursor.to_handle() as HCURSOR,
                 hbrBackground: self.background,
                 lpszMenuName: menu_p,
                 lpszClassName: clsname_u.as_ptr(),
-                hIconSm: self.icon_small.to_handle(),
+                hIconSm: self.icon_small.to_handle() as HICON,
             };
 
-            let res = unsafe { super::ll::all::RegisterClassExW(&wcex) };
+            let res = unsafe { user32::RegisterClassExW(&wcex) };
             res != 0
         })
     }
@@ -146,7 +147,7 @@ impl Window {
         let wnd = unsafe {
             let clsname_u = classname.to_c_u16();
             let title_u = params.window_name.to_c_u16();
-            let wnd = super::ll::all::CreateWindowExW(
+            let wnd = user32::CreateWindowExW(
                 params.ex_style, clsname_u.as_ptr(), title_u.as_ptr(), params.style,
                 params.x as c_int, params.y as c_int,
                 params.width as c_int, params.height as c_int,
@@ -164,15 +165,15 @@ impl Window {
     }
 
     pub fn show(&self, cmd_show: isize) -> bool {
-        unsafe { super::ll::all::ShowWindow(self.wnd, cmd_show as c_int) == 0 }
+        unsafe { user32::ShowWindow(self.wnd, cmd_show as c_int) == 0 }
     }
 
     pub fn show_async(&self, cmd_show: isize) -> bool {
-        unsafe { super::ll::all::ShowWindowAsync(self.wnd, cmd_show as c_int) == 0 }
+        unsafe { user32::ShowWindowAsync(self.wnd, cmd_show as c_int) == 0 }
     }
 
     pub fn update(&self) -> bool {
-        unsafe { super::ll::all::UpdateWindow(self.wnd) == 0 }
+        unsafe { user32::UpdateWindow(self.wnd) == 0 }
     }
 
     pub fn client_rect(&self) -> Option<RECT> {
@@ -183,7 +184,7 @@ impl Window {
             bottom: 0,
         };
         let res = unsafe {
-            super::ll::all::GetClientRect(self.wnd, &mut rect as *mut RECT)
+            user32::GetClientRect(self.wnd, &mut rect as *mut RECT)
         } != 0;
         match res {
             true => Some(rect),
@@ -196,7 +197,7 @@ impl Window {
     ) -> bool {
         // TODO: hwndInsertAfter
         unsafe {
-            super::ll::all::SetWindowPos(
+            user32::SetWindowPos(
                 self.wnd, ptr::null_mut(), x as c_int, y as c_int,
                 width as c_int, height as c_int, flags
             ) != 0
@@ -206,32 +207,32 @@ impl Window {
     pub fn set_focus(&self) -> Window {
         unsafe {
             Window {
-                wnd: super::ll::all::SetFocus(self.wnd)
+                wnd: user32::SetFocus(self.wnd)
             }
         }
     }
 
     pub fn send_message(&self, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
         unsafe {
-            super::ll::all::SendMessageW(self.wnd, msg, wparam, lparam)
+            user32::SendMessageW(self.wnd, msg, wparam, lparam)
         }
     }
 
     pub fn post_message(&self, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> bool {
         1 == unsafe {
-            super::ll::all::PostMessageW(self.wnd, msg, wparam, lparam)
+            user32::PostMessageW(self.wnd, msg, wparam, lparam)
         }
     }
 
     pub fn invalidate_rect(&self, rect: RECT, erase: bool) -> bool {
         1 == unsafe {
-            super::ll::all::InvalidateRect(self.wnd, &rect, erase as BOOL)
+            user32::InvalidateRect(self.wnd, &rect, erase as BOOL)
         }
     }
 
     pub fn invalidate(&self, erase: bool) -> bool {
         1 == unsafe {
-            super::ll::all::InvalidateRect(self.wnd, ptr::null(), erase as BOOL)
+            user32::InvalidateRect(self.wnd, ptr::null(), erase as BOOL)
         }
     }
 }
@@ -289,7 +290,7 @@ pub extern "system" fn main_wnd_proc(wnd: HWND, msg: UINT, w: WPARAM, l: LPARAM)
 
 
 pub trait OnCreate {
-    fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
+    fn on_create(&self, _cs: &CREATESTRUCTW) -> bool {
         true
     }
 }
@@ -297,7 +298,7 @@ pub trait OnCreate {
 pub trait OnDestroy {
     fn on_destroy(&self) {
         unsafe {
-            super::ll::all::PostQuitMessage(0 as c_int);
+            user32::PostQuitMessage(0 as c_int);
         }
     }
 }
