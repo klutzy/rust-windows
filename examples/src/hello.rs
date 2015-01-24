@@ -12,6 +12,8 @@
 #[macro_use]
 extern crate log;
 
+extern crate winapi;
+
 #[macro_use]
 extern crate "rust-windows" as windows;
 
@@ -19,9 +21,9 @@ use std::ptr;
 use std::cell::RefCell;
 use std::default::Default;
 
+use winapi::{UINT, HBRUSH, CREATESTRUCTW};
+
 use windows::main_window_loop;
-use windows::ll::types::{UINT, HBRUSH};
-use windows::ll::all::CREATESTRUCT;
 use windows::instance::Instance;
 use windows::resource::*;
 use windows::window::{WindowImpl, Window, WndClass, WindowParams};
@@ -48,7 +50,7 @@ struct MainFrame {
 wnd_proc!(MainFrame, win, WM_CREATE, WM_DESTROY, WM_SIZE, WM_SETFOCUS, WM_PAINT);
 
 impl OnCreate for MainFrame {
-    fn on_create(&self, _cs: &CREATESTRUCT) -> bool {
+    fn on_create(&self, _cs: &CREATESTRUCTW) -> bool {
         let rect = self.win.client_rect().unwrap();
         let params = WindowParams {
             window_name: "Hello World".to_string(),
