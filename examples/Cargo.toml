@@ -16,3 +16,6 @@ path = "src/hello.rs"
 
 [dependencies.rust-windows]
 path = ".."
+
+[dependencies]
+winapi = "*"
