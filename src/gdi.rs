@@ -88,7 +88,7 @@ impl Dc {
             right: right as LONG, bottom: bottom as LONG
         };
         let res = unsafe {
-            gdi32::FillRect(self.raw, &rect, brush)
+            user32::FillRect(self.raw, &rect, brush)
         };
         return res != 0;
     }
