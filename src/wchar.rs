@@ -9,6 +9,7 @@
 
 use std::mem;
 use std::fmt;
+use std::fmt::Display;
 use std::vec::Vec;
 
 // Helper struct for *u16 manipulation.
@@ -52,7 +53,7 @@ impl CU16String {
     }
 }
 
-impl fmt::Show for CU16String {
+impl fmt::Display for CU16String {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = if self.buf.is_null() {

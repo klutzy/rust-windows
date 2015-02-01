@@ -2,6 +2,7 @@
 name = "examples"
 version = "0.0.1"
 dependencies = [
+ "log 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rust-windows 0.0.1",
  "winapi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -23,11 +24,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "log"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "rust-windows"
 version = "0.0.1"
 dependencies = [
  "gdi32-sys 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "kernel32-sys 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "user32-sys 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

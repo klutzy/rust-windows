@@ -19,3 +19,4 @@ path = ".."
 
 [dependencies]
 winapi = "*"
+log = "*"
