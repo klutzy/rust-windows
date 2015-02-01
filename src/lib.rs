@@ -7,10 +7,11 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![allow(unstable)]
 #![crate_type = "lib"]
 #![crate_type = "dylib"]
 #![crate_name = "rust-windows"]
+
+#![feature(hash, collections, core)]
 
 #[macro_use] extern crate log;
 extern crate collections;
