@@ -74,7 +74,7 @@ macro_rules! wnd_proc_thunk(
     );
     ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_KEYDOWN) => (
         if $msg == 0x0100 { // WM_KEYDOWN
-            return $self_.on_key_down($w as u8, $l as u32) as ::winapi::::winapi::LRESULT;
+            return $self_.on_key_down($w as u8, $l as u32) as ::winapi::LRESULT;
         }
     );
     ($self_:ident, $msg:ident, $w:ident, $l:ident, WM_KEYUP) => (
