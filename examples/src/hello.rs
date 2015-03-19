@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(os, collections, core)]
+#![feature(core, exit_status)]
 
 #[macro_use]
 extern crate log;
@@ -20,6 +20,7 @@ extern crate "rust-windows" as windows;
 use std::ptr;
 use std::cell::RefCell;
 use std::default::Default;
+use std::env;
 
 use winapi::{UINT, HBRUSH, CREATESTRUCTW};
 
@@ -166,5 +167,5 @@ fn main() {
     main.update();
 
     let exit_code = main_window_loop();
-    std::os::set_exit_status(exit_code as isize);
+    env::set_exit_status(exit_code as i32);
 }

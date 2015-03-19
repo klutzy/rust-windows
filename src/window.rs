@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use user32;
 use winapi::{
     BOOL, CREATESTRUCTW, HBRUSH, HCURSOR, HICON, HMENU, HWND, INT, LPARAM, LRESULT, RECT, UINT,
-    WNDCLASSEXW, WNDPROC, WPARAM, c_int,
+    WNDCLASSEXW, WPARAM, c_int,
 };
 
 use wchar::ToCU16Str;
@@ -42,7 +42,7 @@ impl WndClass {
             let wcex = WNDCLASSEXW {
                 cbSize: std::mem::size_of::<WNDCLASSEXW>() as UINT,
                 style: self.style as UINT,
-                lpfnWndProc: main_wnd_proc as WNDPROC,
+                lpfnWndProc: Some(main_wnd_proc),
                 cbClsExtra: self.cls_extra as INT,
                 cbWndExtra: self.wnd_extra as INT,
                 hInstance: instance.instance,
