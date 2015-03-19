@@ -11,9 +11,10 @@
 #![crate_type = "dylib"]
 #![crate_name = "rust-windows"]
 
-#![feature(hash, collections, core)]
+#![feature(collections, core)]
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 extern crate collections;
 extern crate "gdi32-sys" as gdi32;
 extern crate "kernel32-sys" as kernel32;
@@ -23,7 +24,8 @@ extern crate winapi;
 use std::ptr;
 use winapi::{DWORD, HWND, LONG, LPARAM, LPMSG, LRESULT, MSG, POINT, UINT, WPARAM};
 
-#[macro_use] pub mod macros;
+#[macro_use]
+pub mod macros;
 pub mod instance;
 pub mod resource;
 pub mod font;
