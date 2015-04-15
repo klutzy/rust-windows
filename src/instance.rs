@@ -12,7 +12,7 @@ use std::ptr;
 use kernel32;
 use winapi::{HINSTANCE};
 
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Instance {
     pub instance: HINSTANCE
 }

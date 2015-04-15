@@ -10,7 +10,7 @@ authors = ["klutzy <https://github.com/klutzy>",
 tags = []
 
 [lib]
-name = "rust-windows"
+name = "rust_windows"
 
 [dependencies]
 gdi32-sys = "*"

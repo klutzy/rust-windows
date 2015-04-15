@@ -30,14 +30,14 @@ impl<T: ToHandle> ToHandle for Option<T> {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub enum ImageType {
     IMAGE_BITMAP = 0,
     IMAGE_ICON = 1,
     IMAGE_CURSOR = 2,
 }
 
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Image {
     pub image: HANDLE,
 }
@@ -76,7 +76,7 @@ pub enum MenuResource {
 }
 
 impl MenuResource {
-    pub fn with_menu_p<T, F>(&self, f: F) -> T 
+    pub fn with_menu_p<T, F>(&self, f: F) -> T
         where F: FnOnce(*const u16) -> T {
         match *self {
             MenuResource::MenuName(ref s) => {

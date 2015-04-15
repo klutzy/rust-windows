@@ -19,7 +19,7 @@ use winapi::{
 use font::Font;
 use window::WindowImpl;
 
-#[derive(Copy)]
+#[derive(Clone,Copy)]
 pub struct Dc {
     pub raw: HDC,
 }
