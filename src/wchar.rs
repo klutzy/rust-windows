@@ -33,7 +33,7 @@ impl CU16String {
                     }
                     length_counter += 1;
                 }
-		length_counter += 1;
+                length_counter += 1;
                 length_counter as usize
             }
         }
@@ -151,7 +151,6 @@ mod test {
         unsafe {
             from_c_u16_multistring(buf, None, |p| {
                 let b = String::from_utf16(p).unwrap();
-		println!("{:?}", p);
                 assert_eq!(b, compare[i].to_owned());
                 assert_eq!(b.chars().count(), i + 1);
                 i += 1;
