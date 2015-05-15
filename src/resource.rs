@@ -80,7 +80,7 @@ impl MenuResource {
         where F: FnOnce(*const u16) -> T {
         match *self {
             MenuResource::MenuName(ref s) => {
-                let u = s.as_slice().to_c_u16();
+                let u = &s.to_c_u16();
                 f(u.as_ptr())
             }
             MenuResource::MenuId(id) => unsafe { f(std::mem::transmute(id)) },

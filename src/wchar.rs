@@ -23,8 +23,8 @@ pub struct CU16String {
 impl CU16String {
     /// Create a CU16String from a pointer.
     pub unsafe fn new(buf: *const u16) -> CU16String {
-        CU16String { 
-            buf: buf, 
+        CU16String {
+            buf: buf,
             len: {
                 let mut length_counter = 0;
                 loop {
@@ -33,6 +33,7 @@ impl CU16String {
                     }
                     length_counter += 1;
                 }
+		length_counter += 1;
                 length_counter as usize
             }
         }
@@ -67,8 +68,8 @@ impl fmt::Display for CU16String {
 
 /// Parses a C utf-16 "multistring".
 /// See `std::c_str::from_c_multistring` for detailed explanation.
-pub unsafe fn from_c_u16_multistring<F>(buf: *const u16, count: Option<usize>, f: F) -> usize 
-    where F: Fn(&[u16]) {
+pub unsafe fn from_c_u16_multistring<F>(buf: *const u16, count: Option<usize>, mut f: F) -> usize
+    where F: FnMut(&[u16]) {
     let mut curr_ptr: usize = buf as usize;
     let mut ctr = 0;
     let (limited_count, limit) = match count {
@@ -100,16 +101,16 @@ impl<'a> ToCU16Str for &'a str {
 
 impl ToCU16Str for String {
     fn to_c_u16(&self) -> Vec<u16> {
-        self.as_slice().to_c_u16()
+        let x : &str = &self;
+        x.to_c_u16()
     }
 }
 
-
-impl<S: Str> ToCU16Str for Option<S> {
+impl ToCU16Str for Option<String> {
     fn to_c_u16(&self) -> Vec<u16> {
         match self {
             &None => Vec::new(),
-            &Some(ref s) => s.as_slice().to_c_u16(),
+            &Some(ref s) => (&s).to_c_u16(),
         }
     }
 }
@@ -118,22 +119,21 @@ impl<S: Str> ToCU16Str for Option<S> {
 mod test {
     use super::CU16String;
     use super::from_c_u16_multistring;
-    use std::str::from_utf16;
 
     #[test]
     fn test_as_u16_vec() {
-        let u16s: &[u16] = [
+        let u16s: &[u16] = &[
             0xac00, 0x20, 0xac00, 0x00,
         ];
 
         let cu = unsafe { CU16String::new(u16s.as_ptr()) };
         let v = cu.as_u16_vec();
-        assert_eq!(v, u16s.slice_to(u16s.len() - 1));
+        assert_eq!(v, &u16s[..u16s.len() - 1]);
     }
 
     #[test]
     fn test_from_c_u16_multistring() {
-        let test: &[u16] = [
+        let test: &[u16] = &[
             0xac00, 0x00,
             0xac00, 0xac00, 0x00,
             0xac00, 0xac00, 0xac00, 0x00,
@@ -150,9 +150,10 @@ mod test {
         let buf = test.as_ptr();
         unsafe {
             from_c_u16_multistring(buf, None, |p| {
-                let b = from_utf16(p).expect("invalid utf-16 sequence");
-                assert_eq!(b.char_len(), i + 1);
+                let b = String::from_utf16(p).unwrap();
+		println!("{:?}", p);
                 assert_eq!(b, compare[i].to_owned());
+                assert_eq!(b.chars().count(), i + 1);
                 i += 1;
             });
         }
