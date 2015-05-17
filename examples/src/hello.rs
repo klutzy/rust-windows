@@ -15,7 +15,7 @@ extern crate log;
 extern crate winapi;
 
 #[macro_use]
-extern crate "rust-windows" as windows;
+extern crate rust_windows as windows;
 
 use std::ptr;
 use std::cell::RefCell;

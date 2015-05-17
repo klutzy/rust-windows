@@ -9,16 +9,16 @@
 
 #![crate_type = "lib"]
 #![crate_type = "dylib"]
-#![crate_name = "rust-windows"]
+#![crate_name = "rust_windows"]
 
 #![feature(collections, core)]
 
 #[macro_use]
 extern crate log;
 extern crate collections;
-extern crate "gdi32-sys" as gdi32;
-extern crate "kernel32-sys" as kernel32;
-extern crate "user32-sys" as user32;
+extern crate gdi32;
+extern crate kernel32;
+extern crate user32;
 extern crate winapi;
 
 use std::ptr;
