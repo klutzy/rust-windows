@@ -8,6 +8,8 @@
 // except according to those terms.
 
 use std::ptr;
+use std::ffi::OsStr;
+use std::os::windows::ffi::OsStrExt;
 
 use gdi32;
 use user32;
@@ -30,7 +32,10 @@ impl Dc {
     }
 
     pub fn text_out(&self, x: isize, y: isize, s: &str) -> bool {
-        let mut s16 : Vec<u16> = s.utf16_units().collect();
+        let mut s16 : Vec<u16> = OsStr::new( s )
+			.encode_wide()
+			.chain(Some(0).into_iter())
+			.collect::<Vec<_>>();
         let len = s16.len();
 
         s16.push(0u16);

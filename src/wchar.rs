@@ -8,8 +8,10 @@
 // except according to those terms.
 
 use std::mem;
+use std::ffi::OsStr;
 use std::fmt;
 use std::fmt::Display;
+use std::os::windows::ffi::OsStrExt;
 use std::vec::Vec;
 
 // Helper struct for *u16 manipulation.
@@ -93,7 +95,10 @@ pub trait ToCU16Str {
 
 impl<'a> ToCU16Str for &'a str {
     fn to_c_u16(&self) -> Vec<u16> {
-        let mut t : Vec<u16> = self.utf16_units().collect();
+        let mut t : Vec<u16> = OsStr::new( self )
+			.encode_wide()
+			.chain(Some(0).into_iter())
+			.collect::<Vec<_>>();
         t.push(0u16);
         t
     }
