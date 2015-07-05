@@ -11,11 +11,8 @@
 #![crate_type = "dylib"]
 #![crate_name = "rust_windows"]
 
-#![feature(collections, core)]
-
 #[macro_use]
 extern crate log;
-extern crate collections;
 extern crate gdi32;
 extern crate kernel32;
 extern crate user32;
