@@ -7,7 +7,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(core, exit_status)]
+//#![feature(core, exit_status)]
 
 #[macro_use]
 extern crate log;
@@ -104,7 +104,7 @@ impl OnPaint for MainFrame {
         let font = self.font.borrow();
         let pdc = PaintDc::new(self).expect("Paint DC");
         pdc.dc.select_font(&font.expect("font is empty"));
-        pdc.dc.text_out(0, 0, self.title.as_slice());
+        pdc.dc.text_out(0, 0, self.title.as_ref());
     }
 }
 
@@ -154,7 +154,7 @@ impl MainFrame {
         };
 
         Window::new(instance, Some(wproc as Box<WindowImpl + 'static>),
-                    wnd_class.classname.as_slice(), &win_params)
+                    wnd_class.classname.as_ref(), &win_params)
     }
 }
 
@@ -167,5 +167,5 @@ fn main() {
     main.update();
 
     let exit_code = main_window_loop();
-    env::set_exit_status(exit_code as i32);
+    //env::set_exit_status(exit_code as i32);
 }

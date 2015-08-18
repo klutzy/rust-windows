@@ -9,7 +9,7 @@ authors = [
 	"Kang Seonghoon <https://github.com/lifthrasiir>",
 	"Peter Reid <https://github.com/PeterReid>"
 ]
-
+build="build.rs"
 [[bin]]
 name = "hello"
 path = "src/hello.rs"
