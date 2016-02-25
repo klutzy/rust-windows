@@ -60,49 +60,6 @@ impl WndClass {
     }
 }
 
-pub static WS_BORDER: u32 = 0x800000;
-pub static WS_CAPTION: u32 = 0xc00000;
-pub static WS_CHILD: u32 = 0x40000000;
-pub static WS_CHILDWINDOW: u32 = 0x40000000;
-pub static WS_CLIPCHILDREN: u32 = 0x2000000;
-pub static WS_CLIPSIBLINGS: u32 = 0x4000000;
-pub static WS_DISABLED: u32 = 0x8000000;
-pub static WS_DLGFRAME: u32 = 0x400000;
-pub static WS_GROUP: u32 = 0x20000;
-pub static WS_HSCROLL: u32 = 0x100000;
-pub static WS_ICONIC: u32 = 0x20000000;
-pub static WS_MAXIMIZE: u32 = 0x1000000;
-pub static WS_MAXIMIZEBOX: u32 = 0x10000;
-pub static WS_MINIMIZE: u32 = 0x20000000;
-pub static WS_MINIMIZEBOX: u32 = 0x20000;
-pub static WS_OVERLAPPED: u32 = 0;
-pub static WS_OVERLAPPEDWINDOW: u32 = 0xcf0000;
-pub static WS_POPUP: u32 = 0x80000000;
-pub static WS_POPUPWINDOW: u32 = 0x80880000;
-pub static WS_SIZEBOX: u32 = 0x40000;
-pub static WS_SYSMENU: u32 = 0x80000;
-pub static WS_TABSTOP: u32 = 0x10000;
-pub static WS_THICKFRAME: u32 = 0x40000;
-pub static WS_TILED: u32 = 0;
-pub static WS_TILEDWINDOW: u32 = 0xcf0000;
-pub static WS_VISIBLE: u32 = 0x10000000;
-pub static WS_VSCROLL: u32 = 0x200000;
-
-pub static ES_AUTOHSCROLL: u32 = 128;
-pub static ES_AUTOVSCROLL: u32 = 64;
-pub static ES_CENTER: u32 = 1;
-pub static ES_LEFT: u32 = 0;
-pub static ES_LOWERCASE: u32 = 16;
-pub static ES_MULTILINE: u32 = 4;
-pub static ES_NOHIDESEL: u32 = 256;
-pub static ES_NUMBER: u32 = 0x2000;
-pub static ES_OEMCONVERT: u32 = 0x400;
-pub static ES_PASSWORD: u32 = 32;
-pub static ES_READONLY: u32 = 0x800;
-pub static ES_RIGHT: u32 = 2;
-pub static ES_UPPERCASE: u32 = 8;
-pub static ES_WANTRETURN: u32 = 4096;
-
 pub struct WindowParams {
     pub window_name: String,
     pub style: u32,
