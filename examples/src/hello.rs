@@ -23,22 +23,26 @@ use std::default::Default;
 use std::env;
 
 use winapi::{UINT, HBRUSH, CREATESTRUCTW};
+use winapi::{DWORD, WORD, LPARAM, WPARAM, LRESULT};
+use winapi::{WM_COMMAND, WM_DESTROY};
+use winapi::minwindef::LOWORD;
 
 use windows::main_window_loop;
 use windows::instance::Instance;
 use windows::resource::*;
 use windows::window::{WindowImpl, Window, WndClass, WindowParams};
-use windows::window::{OnCreate, OnSize, OnDestroy, OnPaint, OnFocus};
+use windows::window::{OnCreate, OnSize, OnDestroy, OnPaint, OnFocus, OnMessage};
 use windows::window;
 use windows::gdi::PaintDc;
 use windows::font::Font;
 use windows::font;
+use windows::dialog::DialogUtil;
 
 // TODO duplicate of hello.rc
-static IDI_ICON: isize = 0x101;
-static MENU_MAIN: isize = 0x201;
-//static MENU_NEW: isize = 0x202;
-//static MENU_EXIT: isize = 0x203;
+const IDI_ICON: isize = 0x101;
+const MENU_MAIN: isize = 0x201;
+const MENU_NEW: WORD = 0x202;
+const MENU_EXIT: WORD = 0x203;
 
 struct MainFrame {
     win: Window,
@@ -48,7 +52,7 @@ struct MainFrame {
     font: RefCell<Option<Font>>,
 }
 
-wnd_proc!(MainFrame, win, WM_CREATE, WM_DESTROY, WM_SIZE, WM_SETFOCUS, WM_PAINT);
+wnd_proc!(MainFrame, win, WM_CREATE, WM_DESTROY, WM_SIZE, WM_SETFOCUS, WM_PAINT, ANY);
 
 impl OnCreate for MainFrame {
     fn on_create(&self, _cs: &CREATESTRUCTW) -> bool {
@@ -111,6 +115,31 @@ impl OnPaint for MainFrame {
 impl OnFocus for MainFrame {
     fn on_focus(&self, _w: Window) {
         self.edit.borrow().expect("edit is empty").set_focus();
+    }
+}
+
+impl OnMessage for MainFrame {
+    fn on_message(&self, _message: UINT, _wparam: WPARAM, _lparam: LPARAM) -> Option<LRESULT> {
+        match _message {
+            WM_COMMAND => {
+                let menu = LOWORD( _wparam as DWORD );
+                match menu {
+                    MENU_NEW => {
+                        self.win.message_box( "New document.", "New..." );
+                        self.edit.borrow().expect("edit is empty")
+                            .set_window_text( "Hello World" );
+                    },
+                    MENU_EXIT => {
+                        self.win.send_message( WM_DESTROY, 0, 0 );
+                    },
+                    _ => {}
+                }
+            },
+
+            _ => { /* Other messages. */ }
+        }
+
+        None
     }
 }
 

@@ -19,7 +19,7 @@ use winapi::{
     WNDCLASSEXW, WPARAM, c_int,
 };
 
-use wchar::ToCU16Str;
+use wchar::{FromCU16Str,ToCU16Str};
 use instance::Instance;
 use resource::*;
 
@@ -233,6 +233,30 @@ impl Window {
     pub fn invalidate(&self, erase: bool) -> bool {
         1 == unsafe {
             user32::InvalidateRect(self.wnd, ptr::null(), erase as BOOL)
+        }
+    }
+
+    pub fn get_window_text(&self) -> String {
+        unsafe {
+            let len = user32::GetWindowTextLengthW(self.wnd);
+            let mut buf = vec![ 0u16; (len+1) as usize ];
+
+            let read = user32::GetWindowTextW(self.wnd, buf.as_mut_ptr(), (len+1) );
+            if read == len {
+                match String::from_c_u16(&buf) {
+                    None => String::new(),
+                    Some(s) => s
+                }
+            } else {
+                String::new()
+            }
+        }
+    }
+
+    pub fn set_window_text(&self, text: &str ) -> bool {
+        let text_u = text.to_c_u16();
+        1 == unsafe {
+            user32::SetWindowTextW(self.wnd, text_u.as_ptr())
         }
     }
 }

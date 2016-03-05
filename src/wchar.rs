@@ -8,10 +8,10 @@
 // except according to those terms.
 
 use std::mem;
-use std::ffi::OsStr;
+use std::ffi::{OsStr,OsString};
 use std::fmt;
 use std::fmt::Display;
-use std::os::windows::ffi::OsStrExt;
+use std::os::windows::ffi::{OsStrExt, OsStringExt};
 use std::vec::Vec;
 
 // Helper struct for *u16 manipulation.
@@ -117,6 +117,17 @@ impl ToCU16Str for Option<String> {
             &None => Vec::new(),
             &Some(ref s) => (&s).to_c_u16(),
         }
+    }
+}
+
+pub trait FromCU16Str {
+    fn from_c_u16(wide: &Vec<u16>) -> Option<String>;
+}
+
+impl FromCU16Str for String {
+    fn from_c_u16(wide: &Vec<u16>) -> Option<String> {
+        let t = OsString::from_wide(wide);
+        t.to_str().map( str::to_string )
     }
 }
 
