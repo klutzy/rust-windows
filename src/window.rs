@@ -115,6 +115,7 @@ pub struct WindowParams {
     pub ex_style: u32,
 }
 
+/// Thin wrapper of `HWND` type
 #[derive(PartialEq, Eq, Hash, Copy)]
 pub struct Window {
     pub wnd: HWND,
@@ -136,6 +137,12 @@ impl Window {
     pub fn null() -> Window {
         Window {
             wnd: ptr::null_mut(),
+        }
+    }
+
+    pub fn from_handle(handle: HWND) -> Window {
+        Window {
+            wnd: handle
         }
     }
 
@@ -317,12 +324,31 @@ pub unsafe extern "system" fn main_wnd_proc(wnd: HWND,
 
 
 pub trait OnCreate {
+    #[inline(always)]
+    fn wm_create(&self, _wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        let cs = unsafe {
+            let pcs = std::mem::transmute::<LPARAM, *const CREATESTRUCTW>(lparam);
+            &(*pcs)
+        };
+        let ret = self.on_create(cs);
+        if ret {
+            return 0 as LRESULT;
+        } else {
+            return -1 as LRESULT;
+        }
+    }
+
     fn on_create(&self, _cs: &CREATESTRUCTW) -> bool {
         true
     }
 }
 
 pub trait OnDestroy {
+    #[inline(always)]
+    fn wm_destroy(&self, _wparam: WPARAM, _lparam: LPARAM) -> LRESULT {
+        0 as LRESULT
+    }
+
     fn on_destroy(&self) {
         unsafe {
             user32::PostQuitMessage(0 as c_int);
@@ -331,43 +357,105 @@ pub trait OnDestroy {
 }
 
 pub trait OnPaint {
+    #[inline(always)]
+    fn wm_paint(&self, _wparam: WPARAM, _lparam: LPARAM) -> LRESULT {
+        self.on_paint();
+        0 as LRESULT
+    }
+
     fn on_paint(&self) {
     }
 }
 
 pub trait OnSize {
+    #[inline(always)]
+    fn wm_size(&self, _wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        let l = lparam as u32;
+        let width = (l & 0xFFFF) as isize;
+        let height = (l >> 16) as isize;
+        self.on_size(width, height);
+        0 as LRESULT
+    }
+
     fn on_size(&self, _width: isize, _height: isize) {
     }
 }
 
-pub trait OnFocus {
-    fn on_focus(&self, _prev: Window) {
+pub trait OnSetFocus {
+    #[inline(always)]
+    fn wm_set_focus(&self, wparam: WPARAM, _lparam: LPARAM) -> LRESULT {
+        let w = Window::from_handle(wparam as HWND);
+        self.on_set_focus(w);
+        0 as LRESULT
+    }
+
+    fn on_set_focus(&self, _prev: Window) {
     }
 }
 
 pub trait OnLeftButtonDown {
+    #[inline(always)]
+    fn wm_left_button_down(&self, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        let l = lparam as u32;
+        let x = (l & 0xFFFF) as isize;
+        let y = (l >> 16) as isize;
+        let flags = wparam as u32;
+        self.on_left_button_down(x, y, flags);
+        0 as LRESULT
+    }
+
     fn on_left_button_down(&self, _x: isize, _y: isize, _flags: u32) {
     }
 }
 
 pub trait OnLeftButtonUp {
+    #[inline(always)]
+    fn wm_left_button_up(&self, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        let l = lparam as u32;
+        let x = (l & 0xFFFF) as isize;
+        let y = (l >> 16) as isize;
+        let flags = wparam as u32;
+        self.on_left_button_up(x, y, flags);
+        0 as LRESULT
+    }
+
     fn on_left_button_up(&self, _x: isize, _y: isize, _flags: u32) {
     }
 }
 
 pub trait OnKeyDown {
+    #[inline(always)]
+    fn wm_key_down(&self, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        let keycode = wparam as u8;
+        let flags = lparam as u32;
+        return self.on_key_down(keycode, flags) as LRESULT;
+    }
+
     fn on_key_down(&self, _keycode: u8, _flags: u32) -> bool {
         return false;
     }
 }
 
 pub trait OnKeyUp {
+    #[inline(always)]
+    fn wm_key_up(&self, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        let keycode = wparam as u8;
+        let flags = lparam as u32;
+        return self.on_key_up(keycode, flags) as LRESULT;
+    }
+
     fn on_key_up(&self, _keycode: u8, _flags: u32) -> bool {
         return false;
     }
 }
 
 pub trait OnEraseBackground {
+    #[inline(always)]
+    fn wm_erase_background(&self, _wparam: WPARAM, _lparam: LPARAM) -> LRESULT {
+        return self.on_erase_background() as LRESULT;
+    }
+
+    /// return true iff background does not need erasing.
     fn on_erase_background(&self) -> bool {
         false
     }

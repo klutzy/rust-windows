@@ -21,8 +21,8 @@ extern crate winapi;
 use std::ptr;
 use winapi::{DWORD, HWND, LONG, LPARAM, LPMSG, LRESULT, MSG, POINT, UINT, WPARAM};
 
-#[macro_use]
-pub mod macros;
+// #[macro_use]
+// pub mod macros;
 pub mod instance;
 pub mod resource;
 pub mod font;
