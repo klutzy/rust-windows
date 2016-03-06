@@ -303,6 +303,7 @@ pub trait OnCreate {
 pub trait OnDestroy {
     #[inline(always)]
     fn wm_destroy(&self, _wparam: WPARAM, _lparam: LPARAM) -> LRESULT {
+        self.on_destroy();
         0 as LRESULT
     }
 
