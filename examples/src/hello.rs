@@ -31,7 +31,7 @@ use windows::main_window_loop;
 use windows::instance::Instance;
 use windows::resource::*;
 use windows::window::{WindowImpl, Window, WndClass, WindowParams};
-use windows::window::{OnCreate, OnSize, OnDestroy, OnPaint, OnFocus, OnMessage};
+use windows::window::{OnCreate, OnSize, OnDestroy, OnPaint, OnSetFocus, OnMessage};
 use windows::window;
 use windows::gdi::PaintDc;
 use windows::font::Font;
@@ -112,8 +112,8 @@ impl OnPaint for MainFrame {
     }
 }
 
-impl OnFocus for MainFrame {
-    fn on_focus(&self, _w: Window) {
+impl OnSetFocus for MainFrame {
+    fn on_set_focus(&self, _w: Window) {
         self.edit.borrow().expect("edit is empty").set_focus();
     }
 }
